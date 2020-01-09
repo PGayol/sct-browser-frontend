@@ -4,10 +4,10 @@ var config = { //URU
     release: "",
     releaseName: "",
     langRefset: ["5641000179103"],
-    statsButtons: ["AAAAAA", "BBBBBB"], // URI of each statistics page 
-    statsButtonsText:["Link to Statistics 1", "Link to Statistics 2"], // Description text of each button
-    selectedLanguage: "en_US",
-    selectedFlag: "img/flags/uy.png",
+    // statsButtons: ["AAAAAA", "BBBBBB"], // URI of each statistics page 
+    // statsButtonsText:["Link to Statistics 1", "Link to Statistics 2"], // Description text of each button
+    selectedLanguage: "es_UY",
+    selectedFlag: "img/flags/es_UY.png",
     selectedRightLogo: "img/logo-salud-uy-small.png",
     selectedLeftLogo: "",
     copyrightText: "&copy; Salud.uy 2019",
