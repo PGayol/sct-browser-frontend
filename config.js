@@ -4,10 +4,12 @@ var config = { //URU
     release: "",
     releaseName: "",
     langRefset: ["5641000179103"],
-    statsButtons: 0, // Set to 0, 1 or 2 depending on how many statistics buttons you want to show. E.g: 2 for Cadanada (extension and french translation stats).
+    statsButtons: ["AAAAAA", "BBBBBB"], // URI of each statistics page 
+    statsButtonsText:["Link to Statistics 1", "Link to Statistics 2"], // Description text of each button
     selectedLanguage: "es_UY",
     selectedFlag: "img/flags/uy.png",
-    selectedLogo: "img/logo-salud-uy-small.png",
+    selectedRightLogo: "img/logo-salud-uy-small.png",
+    selectedLeftLogo: "",
     copyrightText: "&copy; Salud.uy 2019",
     bussinesLink: "https://Salud.uy",
     languages: ["es"],

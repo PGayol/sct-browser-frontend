@@ -1530,15 +1530,23 @@
                         <span class="icon-bar"></span>
                     </button>
                 <a class="navbar-brand" href="javascript:void(0);" onclick="initialize();" id="navBarBrand">
-                    <strong>
-                            &nbsp;&nbsp;SNOMED CT Browser</strong></a>
+                    <script>
+                        var titleWrapper = document.getElementById("navBarBrand");
+                        var myHTML = '';
+                        if(selectedLeftLogo === ""){
+                            myHTML+= '<strong>&nbsp;&nbsp;IHTSDO SNOMED CT Browser</strong></a>';
+                        } else {
+                            myHTML+= '<img style="height: 50px;display: inline-block;margin-top: -5px;" src="' + selectedLeftLogo + '"></a>';
+                        }
+                        titleWrapper.innerHTML = myHTML;
+                    </script>
             </div>
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1" style="padding-left: 20px; padding-right: 20px;">
                 <ul class="nav navbar-nav navbar-right">
                     <li class="navbar-btn" id="edition-selector">
-                        <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
-                                <span class="i18n" data-i18n-id="i18n_release">Release</span>:&nbsp;<span id="editionLabel"></span> <span class="caret"></span>
+                        <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" style="margin-top: -28px;">
+                            <span class="i18n" data-i18n-id="i18n_release">Release</span>:&nbsp;<span id="editionLabel"></span> <span class="caret"></span>
                             </button>
                         <ul class="dropdown-menu" id="releaseSwitcher" role="menu">
                         </ul>
@@ -1603,8 +1611,16 @@
                             </a> -->
                             <p class="pull-right"><a id="logoLink" target="_blank"><img id="logo" class="pull-right visible-lg"src="" alt="logo"></a>
                                 <script>
-                                    document.getElementById('logo').src = selectedLogo;
+                                if(selectedRightLogo !== ""){
+                                    document.getElementById('logo').src = selectedRightLogo;
+                                } else {
+                                    document.getElementById('logo').src = "/img/newlogo.png";
+                                }
+                                if(bussinesLink !== ""){
                                     document.getElementById('logoLink').href=bussinesLink; 
+                                } else {
+                                    document.getElementById('logoLink').href="http://www.snomed.org/";
+                                }
                                 </script>
                     </li>
                 </ul>
