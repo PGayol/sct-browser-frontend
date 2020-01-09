@@ -7,7 +7,7 @@ var config = { //URU
     // statsButtons: ["AAAAAA", "BBBBBB"], // URI of each statistics page 
     // statsButtonsText:["Link to Statistics 1", "Link to Statistics 2"], // Description text of each button
     selectedLanguage: "es_UY",
-    selectedFlag: "img/flags/es_UY.png",
+    selectedFlag: "img/flags/uy.png",
     selectedRightLogo: "img/logo-salud-uy-small.png",
     selectedLeftLogo: "",
     copyrightText: "&copy; Salud.uy 2019",
