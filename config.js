@@ -16,4 +16,5 @@ var config = { //URU
     languagesArray: {
         'es': 'Spanish'
     },
+    defaultLanguage: "es"
 }
