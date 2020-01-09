@@ -1532,7 +1532,7 @@
                         <span class="icon-bar"></span>
                     </button>
                 <a class="navbar-brand" href="javascript:void(0);" onclick="initialize();" id="navBarBrand">
-                    <script>
+                    <!-- <script>
                         var titleWrapper = document.getElementById("navBarBrand");
                         var myHTML = '';
                         if(selectedLeftLogo === ""){
@@ -1541,14 +1541,15 @@
                             myHTML+= '<img style="height: 50px;display: inline-block;margin-top: -5px;" src="' + selectedLeftLogo + '"></a>';
                         }
                         titleWrapper.innerHTML = myHTML;
-                    </script>
+                    </script> -->
+                    <strong>
+                        &nbsp;&nbsp;SNOMED CT Browser</strong></a>
             </div>
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1" style="padding-left: 20px; padding-right: 20px;">
                 <ul class="nav navbar-nav navbar-right">
                     <li class="navbar-btn" id="edition-selector">
-                        <!-- <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" style="margin-top: -20px;"> -->
-                        <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
+                        <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" style="margin-top: -20px;">
                             <span class="i18n" data-i18n-id="i18n_release">Release</span>:&nbsp;<span id="editionLabel"></span> <span class="caret"></span>
                             </button>
                         <ul class="dropdown-menu" id="releaseSwitcher" role="menu">
@@ -1556,7 +1557,7 @@
                     </li>
 
                     <li class="navbar-btn" id="perspective-selector">
-                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" style="margin-top: -20px;">
                                 <span class="i18n" data-i18n-id="i18n_perspective">Perspective</span>:&nbsp;<span id="perspectiveLabel"><em>...</em></span> <span class="caret"></span>
                             </button>
                         <ul class="dropdown-menu">
