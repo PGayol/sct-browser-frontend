@@ -381,6 +381,7 @@
 
                         options.defaultLanguageReferenceSets = release.defaultLanguageReferenceSets ? release.defaultLanguageReferenceSets : [];
                         let ui_language = release.defaultLanguageCode ? release.defaultLanguageCode : parsedLanguages.substr(0, 2);
+                        console.log(release.defaultLanguageCode);
                         options.defaultLanguage = parsedLanguages.substr(0, 2);
                         var selectedLanguageAndFlag = getSelectedLanguageAndFlag(ui_language);
 
@@ -395,7 +396,6 @@
         }
 
         var getSelectedLanguageAndFlag = function(ui_language) {
-            console.log("ui lang is:" + ui_language);
             if (ui_language == "en") {
                 selectedLanguage = 'en_US';
                 selectedFlag = '/browser/img/flags/us.png';
