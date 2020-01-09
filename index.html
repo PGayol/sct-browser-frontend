@@ -26,6 +26,7 @@
     <script src="/browser/external-libs/excellentexport.min.js"></script>
     <script src="/browser/external-libs/notify.js"></script>
     <script src="/browser/external-libs/clipboard.min.js"></script>
+    <script src="config.js"></script>
     <script src="/browser/external-libs/popover-extra-placements.js" type="text/javascript"></script>
     <script src="/browser/external-libs/canvg.min.js" type="text/javascript"></script>
     <script src="/browser/external-libs/canvas2image.js" type="text/javascript"></script>
@@ -74,27 +75,29 @@
         }
 
         var enableQueriesInFullPerspective = true;
-        var selectedLanguage = 'en_US';
-        var selectedFlag = '/browser/img/flags/us.png';
+        var selectedLanguage = config.selectedLanguage;
+        var selectedFlag = config.selectedFlag;
         var currentPerspective = "home";
+        var selectedLogo = config.selectedLogo;
+        var copyrightText = config.copyrightText;
+        var bussinesLink = config.bussinesLink;
 
         var originalTask = '';
         var options = {
-            serverUrl: "",
+            serverUrl: config.serverUrl,
             queryServerUrl: "",
             queryBranch: "MAIN/2019-07-31",
-            edition: "MAIN/2019-07-31",
-            release: "",
+            edition: config.edition,
+            release: config.release,
             showIds: false,
             hideNotAcceptable: true,
             displayInactiveDescriptions: false,
             displaySynonyms: true,
             selectedView: "inferred",
             displayChildren: false,
-            languages: ["en"],
-            languagesArray: {
-                'en': 'English'
-            },
+            languages: config.languages,
+            languagesArray: config.languagesArray,
+            defaultLanguage: config.defaultLanguage,
             defaultLanguage: 'en',
             closeButton: false,
             collapseButton: false,
@@ -1595,9 +1598,14 @@
                         </ul>
                     </li>
                     <li>
-                        <p class="pull-right">
+                        <!-- <p class="pull-right">
                             <a href="http://www.snomed.org" target="_blank"><img class="pull-right visible-lg" src="/browser/img/snomed-logo.png" style="width:110px;" alt="SNOMED International delivering SNOMED, the global clinical terminology" />
-                            </a>
+                            </a> -->
+                            <p class="pull-right"><a id="logoLink" target="_blank"><img id="logo" class="pull-right visible-lg"src="" alt="logo"></a>
+                                <script>
+                                    document.getElementById('logo').src = selectedLogo;
+                                    document.getElementById('logoLink').href=bussinesLink; 
+                                </script>
                     </li>
                 </ul>
             </div>
@@ -1653,7 +1661,10 @@
             </p>
             <p><strong><a href="http://snomed.org/snomedtools-privacy" target=_blank>SNOMED International Privacy Policy</a></strong> <span id="csconsentlink">Cookie Settings</span></small>
             </p>
-            <p> <small><b>&copy; SNOMED International 2019</b> v2.1<br></small>
+            <p> 
+                <!-- <small><b>&copy; SNOMED International 2019</b> v2.1<br></small> -->
+                <small><b id="copyrightText"></b></small>
+                <script>document.getElementById('copyrightText').innerHTML = copyrightText</script>
             </p>
         </div>
 
@@ -1695,7 +1706,10 @@
             </p>
             <p><strong><a href="http://snomed.org/snomedtools-privacy" target=_blank>SNOMED International Privacy Policy</a></strong></small>
             </p>
-            <p> <small><b>&copy; SNOMED International 2018</b> v1.37.4.4<br></small>
+            <p> 
+                <!-- <small><b>&copy; SNOMED International 2018</b> v1.37.4.4<br></small> -->
+                <small><b id="copyrightText"></b></small>
+                <script>document.getElementById('copyrightText').innerHTML = copyrightText</script>
             </p>
         </div>
 
