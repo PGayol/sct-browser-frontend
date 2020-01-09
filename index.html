@@ -381,7 +381,6 @@
 
                         options.defaultLanguageReferenceSets = release.defaultLanguageReferenceSets ? release.defaultLanguageReferenceSets : [];
                         let ui_language = release.defaultLanguageCode ? release.defaultLanguageCode : parsedLanguages.substr(0, 2);
-                        console.log(release.defaultLanguageCode);
                         options.defaultLanguage = parsedLanguages.substr(0, 2);
                         var selectedLanguageAndFlag = getSelectedLanguageAndFlag(ui_language);
 
@@ -415,8 +414,8 @@
                 selectedLanguage = 'es_UY';
                 selectedFlag = '/browser/img/flags/uy.png';
             } else {
-                selectedLanguage = 'en_US';
-                selectedFlag = '/browser/img/flags/us.png';
+                selectedLanguage = 'en_UY';
+                selectedFlag = '/browser/img/flags/uy.png';
             }
             return {
                 'selectedLanguage': selectedLanguage,
