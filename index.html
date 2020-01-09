@@ -395,6 +395,7 @@
         }
 
         var getSelectedLanguageAndFlag = function(ui_language) {
+            console.log("ui lang is:" + ui_language);
             if (ui_language == "en") {
                 selectedLanguage = 'en_US';
                 selectedFlag = '/browser/img/flags/us.png';
@@ -417,7 +418,6 @@
                 selectedLanguage = 'en_US';
                 selectedFlag = '/browser/img/flags/us.png';
             }
-            console.log(selectedLanguage);
             return {
                 'selectedLanguage': selectedLanguage,
                 'selectedFlag': selectedFlag
