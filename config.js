@@ -12,9 +12,9 @@ var config = { //URU
     selectedLeftLogo: "",
     copyrightText: "&copy; Salud.uy 2019",
     bussinesLink: "https://Salud.uy",
-    languages: ["es"],
+    languages: ["es_UY"],
     languagesArray: {
-        'es': 'Spanish'
+        'es_UY': 'Spanish'
     },
     defaultLanguage: "es_UY"
 }
