@@ -2562,8 +2562,8 @@ function conceptDetails(divElement, conceptId, options) {
                 panel.updateCanvas('');
             });
 
-            $('.moreInfo').find(".member-row").unbind();
-            $('.moreInfo').find(".member-row").click(function(e) {
+            $('.moreInfo').unbind();
+            $('.moreInfo').click(function(e) {
                 var clickedConceptId = $(e.target).data("concept-id");
                 result.items.forEach(function(member) {
                     if (member.referencedComponent.conceptId == clickedConceptId) {
