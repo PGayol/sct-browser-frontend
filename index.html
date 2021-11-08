@@ -476,15 +476,12 @@
                     $span1.text("Go browsing...");
                     var $span2 = $('<span>').attr("class", "small");
                     if (options.dailyBuildBrowser) {
-                        console.log(1);
                         $span2.append(release.name + "<br>DAILY BUILD");
                         $("#editionLabel").html(release.name + " DAILY BUILD");
                     } else if (options.communityBrowser) {
-                        console.log(2);
                         $span2.append(release.name + "<br>Community Content");
                         $("#editionLabel").html(release.name + " Community Content");
                     } else {
-                        console.log(3);
                         $span2.append(release.name + "<br>" + release.latestVersion.version);
                     }
 
@@ -544,7 +541,8 @@
                             switchLanguage(selectedLanguageAndFlag.selectedLanguage, selectedLanguageAndFlag.selectedFlag, false);
                         });
                     }
-
+                    console.log($releaseSwitcher);
+                    cosole.log($a);
                     $releaseSwitcher.append($a);
                     $releaseSwitcher.append(" ");
                 }
