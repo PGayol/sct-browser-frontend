@@ -12,9 +12,9 @@
 {{/if_eq}}
 <tbody>
     {{#each result.items}}
-        <tr class="member-row">
+        <tr>
             {{#if_eq ../containingTermOnly false}}
-                <td data-concept-id='{{referencedComponent.conceptId}}' data-term='{{referencedComponent.fsn.term}}'>
+                <td class="member-row" data-concept-id='{{referencedComponent.conceptId}}' data-term='{{referencedComponent.fsn.term}}'>
                     <span class="badge alert-warning" draggable='true' ondragstart="drag(event, '{{../divElementId}}')" data-module="{{referencedComponent.moduleId}}" data-concept-id='{{referencedComponent.conceptId}}' data-term='{{referencedComponent.fsn.term}}'>&nbsp;&nbsp;</span>
                     {{#hasCountryIcon referencedComponent.moduleId}}
                         <div class="phoca-flagbox" style="width:22px;height:22px">
@@ -23,11 +23,11 @@
                     {{/hasCountryIcon}}
                     {{referencedComponent.fsn.term}}
                 </td>            
-                <td data-concept-id='{{referencedComponent.conceptId}}' data-term='{{referencedComponent.pt.term}}'>                
+                <td class="member-row" data-concept-id='{{referencedComponent.conceptId}}' data-term='{{referencedComponent.pt.term}}'>                
                     {{referencedComponent.pt.term}}
                 </td>
             {{else}}
-                <td data-concept-id='{{referencedComponent.conceptId}}' data-term='{{referencedComponent.term}}'>
+                <td class="member-row" data-concept-id='{{referencedComponent.conceptId}}' data-term='{{referencedComponent.term}}'>
                     <span class="badge alert-warning" draggable='true' ondragstart="drag(event, '{{../divElementId}}')" data-module="{{referencedComponent.moduleId}}" data-concept-id='{{referencedComponent.conceptId}}' data-term='{{referencedComponent.term}}'>&nbsp;&nbsp;</span>
                     {{#hasCountryIcon referencedComponent.moduleId}}
                         <div class="phoca-flagbox" style="width:22px;height:22px">
@@ -37,7 +37,7 @@
                     {{referencedComponent.term}}
                 </td>
             {{/if_eq}}
-            <td data-concept-id='{{referencedComponent.conceptId}}'>{{referencedComponent.conceptId}}</td>
+            <td class="member-row" data-concept-id='{{referencedComponent.conceptId}}'>{{referencedComponent.conceptId}}</td>
             <td data-concept-id='{{referencedComponent.conceptId}}'>
                 <button data-id="{{uuid}}" data-concept-id='{{referencedComponent.conceptId}}' style="display: block; margin: auto;" class="btn btn-xs btn-primary ladda-button glyphicon glyphicon-info-sign moreInfo" data-style="zoom-in"></button>
             </td>
