@@ -6,6 +6,7 @@
                 <th><span data-i18n-id="i18n_conceptId" class="i18n">{{i18n "i18n_preferred_term" "Preferred Term"}}</span></th>
             {{/if_eq}}
             <th><span data-i18n-id="i18n_conceptId" class="i18n">{{i18n "i18n_conceptId" "Concept Id"}}</span></th>
+            <th><span data-i18n-id="i18n_info" class="i18n">{{i18n "i18n_info" "Info"}}</span></th>
         </tr>
     </thead>
 {{/if_eq}}
@@ -22,6 +23,9 @@
                     {{/hasCountryIcon}}
                     {{referencedComponent.fsn.term}}
                 </td>            
+                <td data-concept-id='{{referencedComponent.conceptId}}' data-term='{{referencedComponent.pt.term}}'>                
+                    {{referencedComponent.pt.term}}
+                </td>
                 <td data-concept-id='{{referencedComponent.conceptId}}' data-term='{{referencedComponent.pt.term}}'>                
                     {{referencedComponent.pt.term}}
                 </td>
