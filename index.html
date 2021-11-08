@@ -310,6 +310,7 @@
                     } else if (options.dailyBuildBrowser) {
                         if (localReleases && localReleases.length) {
                             localReleases.forEach(function (localRelease) {
+                                localRelease.isOfficialRelease = true;
                                 dailyBuildLocal.push(localRelease);
                             });       
                         }
@@ -475,14 +476,25 @@
                     var $span1 = $('<span>').attr("class", "i18n").attr("data-i18n-id", "i18n_go_browsing");
                     $span1.text("Go browsing...");
                     var $span2 = $('<span>').attr("class", "small");
-                    if (options.dailyBuildBrowser) {
+                    if (options.dailyBuildBrowser && !release.isOfficialRelease) {
                         $span2.append(release.name + "<br>DAILY BUILD");
                         $("#editionLabel").html(release.name + " DAILY BUILD");
                     } else if (options.communityBrowser) {
                         $span2.append(release.name + "<br>Community Content");
                         $("#editionLabel").html(release.name + " Community Content");
                     } else {
-                        $span2.append(release.name + "<br>" + release.latestVersion.version);
+                        if (!release.latestVersion) {
+                            release.latestVersion = {
+                               "shortName":"CA-20210930",
+                               "importDate":"2021-10-07T00:58:20.591Z",
+                               "parentBranchPath":"MAIN/2021-09-30",
+                               "effectiveDate": 20210930,
+                               "version":"2021-09-30",
+                               "description":"SNOMEDCT 20210930 import.",
+                               "branchPath":"MAIN/2021-09-30/RELEASE"
+                            }
+                        }
+                       $span2.append(release.name + "<br>" + release.latestVersion.version);  
                     }
 
                     var $a = $('<a>').attr("class", "btn btn-primary btn-lg").attr("role", "button").attr("style", "margin-bottom : 15px");
