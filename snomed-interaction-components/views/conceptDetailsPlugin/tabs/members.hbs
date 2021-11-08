@@ -26,9 +26,6 @@
                 <td data-concept-id='{{referencedComponent.conceptId}}' data-term='{{referencedComponent.pt.term}}'>                
                     {{referencedComponent.pt.term}}
                 </td>
-                <td data-concept-id='{{referencedComponent.conceptId}}' data-term='{{referencedComponent.pt.term}}'>                
-                    {{referencedComponent.pt.term}}
-                </td>
             {{else}}
                 <td data-concept-id='{{referencedComponent.conceptId}}' data-term='{{referencedComponent.term}}'>
                     <span class="badge alert-warning" draggable='true' ondragstart="drag(event, '{{../divElementId}}')" data-module="{{referencedComponent.moduleId}}" data-concept-id='{{referencedComponent.conceptId}}' data-term='{{referencedComponent.term}}'>&nbsp;&nbsp;</span>
@@ -41,6 +38,9 @@
                 </td>
             {{/if_eq}}
             <td data-concept-id='{{referencedComponent.conceptId}}'>{{referencedComponent.conceptId}}</td>
+            <td data-concept-id='{{referencedComponent.conceptId}}'>
+                <button data-id="{{uuid}}" style="margin-left: 10px;" class="btn btn-xs btn-primary ladda-button pull-right glyphicon glyphicon-info-sign moreInfo" data-style="zoom-in"></button>
+            </td>
 
     {{/each}}
 

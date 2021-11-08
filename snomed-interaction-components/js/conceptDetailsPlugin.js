@@ -2561,6 +2561,21 @@ function conceptDetails(divElement, conceptId, options) {
                 $('#details-tabs-' + panel.divElement.id + ' a:first').tab('show');
                 panel.updateCanvas('');
             });
+
+            $('.moreInfo').find(".member-row").unbind();
+            $('.moreInfo').find(".member-row").click(function(e) {
+                var clickedConceptId = $(e.target).data("concept-id");
+                result.items.forEach(function(member) {
+                    if (member.referencedComponent.conceptId == clickedConceptId) {
+                        if (member.additionalFields) {
+                            console.log(member.additionalFields);
+                        } else {
+                            console.log("No additional fields to show.");
+                        }
+                    }
+                });
+            });
+
             panel.panelMembersLoaded = true;
         }).fail(function() {
             $('#members-' + panel.divElement.id + "-resultsTable").html("<tr><td class='text-muted' colspan='2'><span data-i18n-id='i18n_no_members' class='i18n'>"+i18n_no_members+"</span></td></tr>");
