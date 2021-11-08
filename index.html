@@ -308,6 +308,11 @@
                     } else if (options.communityBrowser) {
                         addEditionLinks($('#commnunity_content_editions'), options.communityContentReleases)
                     } else if (options.dailyBuildBrowser) {
+                        if (localReleases && localReleases.length) {
+                            localReleases.forEach(function (localRelease) {
+                                dailyBuildLocal.push(localRelease);
+                            });       
+                        }
                         addEditionLinks($('#dailybuild_editions'), dailyBuildInternational);
                         addEditionLinks($('#dailybuild_local_editions'), dailyBuildLocal);
                     } else {
@@ -2216,7 +2221,7 @@
                 <!--<a class="btn btn-primary btn-lg" role="button" onclick="switchRelease('Daily Build Edition 20200131', 'en-edition', 'v20200131', '', '900000000000509007', 'https://prod-dailybuild.ihtsdotools.org/api/snomed');switchToFullHeight(404684003, 138875005);"><img src="img/box-logo.png" style="height:20px">&nbsp;&nbsp;&nbsp;<span class="i18n" data-i18n-id="i18n_start_browsing">Start browsing...</span><br><span class="small">Daily Build edition</span></a>-->
                 </p>
                 <p id="lastUpdatedText"></p>
-                <h3>Other Daily Builds:</h3>
+                <!-- <h3>Other Daily Builds:</h3> -->
                 <p id="dailybuild_local_editions" style="margin-bottom : 0px"></p>
             </div>
             <p><span class="i18n" data-i18n-id="i18n_home6"><span class="btn-success"><em>Releases</em></span> will allow the selection of SNOMED CT content from the International Edition or other extensions, with specific dates.</span>
