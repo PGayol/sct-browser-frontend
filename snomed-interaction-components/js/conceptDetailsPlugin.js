@@ -2564,6 +2564,7 @@ function conceptDetails(divElement, conceptId, options) {
 
             $('.moreInfo').unbind();
             $('.moreInfo').click(function(e) {
+                e.preventDefault();
                 var clickedConceptId = $(e.target).data("concept-id");
                 result.items.forEach(function(member) {
                     if (member.referencedComponent.conceptId == clickedConceptId) {
