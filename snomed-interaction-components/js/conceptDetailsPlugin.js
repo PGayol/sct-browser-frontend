@@ -2573,10 +2573,10 @@ function conceptDetails(divElement, conceptId, options) {
                 result.items.forEach(function(member) {
                     if (member.referencedComponent.conceptId == clickedConceptId) {
                         if (member.additionalFields) {
-                            var message = "<style>table{font-family:arial,sans-serif;border-collapse:collapse;width:100%;margin-bottom:10px;}td,th{border:1pxsolid#dddddd;text-align:left;padding:8px;}.item{font-size:medium;}</style>";
-                            message = message + '<table>';
+                            var message = "<style>table{font-family:arial,sans-serif;border-collapse:collapse;width:100%;margin-bottom:10px;}td,th{border: 1px solid #dddddd;text-align:left;padding:8px;}.item{font-size:medium;}</style>";
+                            message = message + '<table><tr><th>Field name</th><th>Field value</th></tr>';
                             Object.entries(member.additionalFields).forEach(function (row) {
-                                message = message + '<tr><td>' + row[0][0].toUpperCase() + row[0].slice(1) + '</td> <td>' + escapeHTML(row[1]) + '</td></tr>';
+                                message = message + '<tr><td><b>' + row[0][0].toUpperCase() + row[0].slice(1) + '</b></td> <td>' + escapeHTML(row[1]) + '</td></tr>';
                             });
                             message = message + '</table>';
                             bootbox.dialog({
