@@ -2574,7 +2574,7 @@ function conceptDetails(divElement, conceptId, options) {
                     if (member.referencedComponent.conceptId == clickedConceptId) {
                         if (member.additionalFields) {
                             var message = "<style>table{font-family:arial,sans-serif;border-collapse:collapse;width:100%;margin-bottom:10px;}td,th{border: 1px solid #dddddd;text-align:center;padding:8px;}.item{font-size:medium;}</style>";
-                            message = message + '<table><tr><th style="width: 10%;">Field name</th><th>Field value</th></tr>';
+                            message = message + '<table class="additionalFields"><tr><th style="width: 10%;">Field name</th><th>Field value</th></tr>';
                             Object.entries(member.additionalFields).forEach(function (row) {
                                 message = message + '<tr><td><b>' + row[0][0].toUpperCase() + row[0].slice(1) + '</b></td> <td>' + escapeHTML(row[1]) + '</td></tr>';
                             });
@@ -2582,15 +2582,30 @@ function conceptDetails(divElement, conceptId, options) {
                             bootbox.dialog({
                                 title: 'Additional fields',
                                 message: message,
-                                backdrop: true,
                                 size: 'large',
+                                closeButton: true,
+                                backdrop: true,
+                                onEscape: true,
                             });
                         } else {
                             bootbox.dialog({
                                 title: 'Additional fields',
                                 message: 'No additional fields.',
+                                closeButton: true,
+                                backdrop: true,
+                                onEscape: true,
                             });
                         }
+
+                        $(this).on('keydown', function(e) {
+                            if (e.keyCode === 27) {
+                                var isVisible = $(".additionalFields").is(":visible");
+                                if (isVisible) {
+                                    bootbox.hideAll();
+                                }
+                            }
+                        });
+
                     }
                 });
             });
