@@ -2568,11 +2568,21 @@ function conceptDetails(divElement, conceptId, options) {
                 var clickedConceptId = $(e.target).data("concept-id");
                 result.items.forEach(function(member) {
                     if (member.referencedComponent.conceptId == clickedConceptId) {
-                        console.log(member);
                         if (member.additionalFields) {
-                            console.log(member.additionalFields);
+                            var message = '<table>';
+                            Object.entries(member.additionalFields).forEach(function (row) {
+                                message = message + '<tr><td>' + row[0] + '</td><td>' + row[1] + '</td></tr>';
+                            });
+                            message = message + '</table>';
+                            bootbox.dialog({
+                                title: 'Additional fields',
+                                message: message,
+                            });
                         } else {
-                            console.log("No additional fields to show.");
+                            bootbox.dialog({
+                                title: 'Additional fields',
+                                message: 'No additional fields.',
+                            });
                         }
                     }
                 });
