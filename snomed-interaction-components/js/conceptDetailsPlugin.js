@@ -2562,6 +2562,10 @@ function conceptDetails(divElement, conceptId, options) {
                 panel.updateCanvas('');
             });
 
+            var escapeHTML = function(html) {
+                return document.createElement('div').appendChild(document.createTextNode(html)).parentNode.innerHTML;
+            };
+
             $('.moreInfo').unbind();
             $('.moreInfo').click(function(e) {
                 e.preventDefault();
@@ -2571,7 +2575,7 @@ function conceptDetails(divElement, conceptId, options) {
                         if (member.additionalFields) {
                             var message = '<table>';
                             Object.entries(member.additionalFields).forEach(function (row) {
-                                message = message + '<tr><td>' + row[0] + '</td><td>' + row[1] + '</td></tr>';
+                                message = message + '<tr><td>' + row[0] + '</td> <td>' + escapeHTML(row[1]) + '</td></tr>';
                             });
                             message = message + '</table>';
                             bootbox.dialog({
