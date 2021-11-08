@@ -2576,7 +2576,7 @@ function conceptDetails(divElement, conceptId, options) {
                             var message = "<style>table{font-family:arial,sans-serif;border-collapse:collapse;width:100%;margin-bottom:10px;}td,th{border:1pxsolid#dddddd;text-align:left;padding:8px;}tr:nth-child(odd){background-color:#dddddd;}.item{font-size:medium;}</style>";
                             message = message + '<table>';
                             Object.entries(member.additionalFields).forEach(function (row) {
-                                message = message + '<tr><td>' + s && row[0][0].toUpperCase() + row[0].slice(1) + '</td> <td>' + escapeHTML(row[1]) + '</td></tr>';
+                                message = message + '<tr><td>' + row[0][0].toUpperCase() + row[0][0].slice(1) + '</td> <td>' + escapeHTML(row[1]) + '</td></tr>';
                             });
                             message = message + '</table>';
                             bootbox.dialog({
