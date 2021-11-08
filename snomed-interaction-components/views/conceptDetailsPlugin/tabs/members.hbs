@@ -39,11 +39,9 @@
             {{/if_eq}}
             <td class="member-row" data-concept-id='{{referencedComponent.conceptId}}'>{{referencedComponent.conceptId}}</td>
             <td data-concept-id='{{referencedComponent.conceptId}}'>
-                {{#if_eq Object.keys(additionalFields).length 0}}
-                    No additional fields
-                {{else}}
+                {{#hasAdditionalFields}}
                     <button data-id="{{uuid}}" data-concept-id='{{referencedComponent.conceptId}}' style="display: block; margin: auto;" class="btn btn-xs btn-primary ladda-button glyphicon glyphicon-info-sign moreInfo" data-style="zoom-in"></button>
-                {{/if_eq}}
+                {{/hasAdditionalFields}}
             </td>
 
     {{/each}}

@@ -2515,6 +2515,12 @@ function conceptDetails(divElement, conceptId, options) {
                 else
                     return opts.inverse(this);
             });
+            Handlebars.registerHelper('hasAdditionalFields', function(additionalFields, opts) {
+                if (Object.keys(additionalFields).length > 0)
+                    return opts.fn(this);
+                else
+                    return opts.inverse(this);
+            });
             if (result.total != 0) {
                 $("#" + panel.divElement.id + "-moreMembers").remove();
                 $("#members-" + panel.divElement.id + "-resultsTable").find(".more-row").remove();
