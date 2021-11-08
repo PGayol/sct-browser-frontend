@@ -2568,6 +2568,7 @@ function conceptDetails(divElement, conceptId, options) {
                 var clickedConceptId = $(e.target).data("concept-id");
                 result.items.forEach(function(member) {
                     if (member.referencedComponent.conceptId == clickedConceptId) {
+                        console.log(member);
                         if (member.additionalFields) {
                             console.log(member.additionalFields);
                         } else {
