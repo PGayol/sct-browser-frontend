@@ -15,7 +15,7 @@
 
     <link rel="stylesheet" type="text/css" href="ecl-builder/styles.css">
     <link rel="stylesheet" type="text/css" href="css/external.css">
-    
+
     <style>
         .modal.fade .modal-dialog {
             margin-top: 60px;
@@ -146,7 +146,10 @@
             "722128001": "ZH",
             "291000210106": "MI",
             "21000241105": "FR",
-            "722130004": "DE"
+            "722130004": "DE",
+            "2041000195100": "DE",
+            "2021000195106": "FR",
+            "2031000195108": "IT"
         };
 
         options.updateReleaseSwitcher = function(branch, conceptId) {
@@ -262,7 +265,7 @@
                     if (options.releases) {
                         for (let i = 0; i < options.releases.items.length; ++i) {
                             var release = options.releases.items[i];
-                            
+
                             /* TODO: The default Accept language should be handled by code-system */
                             if (release.shortName === 'SNOMEDCT-NZ') {
                                 release.defaultAcceptLanguage = 'en-X-271000210107';
@@ -416,6 +419,7 @@
                             }
                         }
                         $('#multi-extension-search').css('display', 'block');
+                        $('#version-selector').css('display', 'block');
                     }
                 } else {
                     if (options.serverUrl === '/snowowl/snomed-ct/v2') {
@@ -535,8 +539,15 @@
                                 }
                             } else {
                                 options.edition = release.latestVersion.branchPath;
-                                $("#editionLabel").html(release.name + " " + release.latestVersion.version);
+                                if (options.publicBrowser) {
+                                    $("#editionLabel").html(release.name);
+                                    $("#versionLabel").html(release.latestVersion.version);
+                                    initVersionsDropdown(release);
+                                } else {
+                                    $("#editionLabel").html(release.name + " " + release.latestVersion.version);
+                                }
                             }
+
                             options.release = '';
                             options.languages = parsedLanguages;
                             options.languageObject = release.languages;
@@ -676,7 +687,7 @@
         }
 
         function initializePublicBrowser() {
-            
+
             setUILanguage();
             var edition = QueryString.edition;
             var isLatestRedirect = true;
@@ -893,7 +904,7 @@
                         let release = options.releases.items[i];
                         if (typeof release.latestVersion !== "undefined") {
                             var $li = $('<li>')
-                            var $a = $('<a>').attr("shortName", release.shortName).append(release.name + " " + release.latestVersion.version);
+                            var $a = $('<a>').attr("shortName", release.shortName).append(release.name);
                             $a.attr("href", "javascript:void(0);");
                             $a.on("click", function(event) {
                                 event.stopPropagation();
@@ -935,12 +946,24 @@
                                             reloadCurrentPerspective(404684003);
                                         }
                                         switchLanguage(selectedLanguageAndFlag.selectedLanguage, selectedLanguageAndFlag.selectedFlag, false);
-                                        $("#editionLabel").html(release.name + " " + release.latestVersion.version);
+                                        if (options.publicBrowser) {
+                                            $("#editionLabel").html(release.name);
+                                            $("#versionLabel").html(release.latestVersion.version);
+                                            initVersionsDropdown(release);
+                                        } else {
+                                            $("#editionLabel").html(release.name + " " + release.latestVersion.version);
+                                        }
                                     });
                                 } else {
                                     reloadCurrentPerspective();
                                     switchLanguage(selectedLanguageAndFlag.selectedLanguage, selectedLanguageAndFlag.selectedFlag, false);
-                                    $("#editionLabel").html(release.name + " " + release.latestVersion.version);
+                                    if (options.publicBrowser) {
+                                        $("#editionLabel").html(release.name);
+                                        $("#versionLabel").html(release.latestVersion.version);
+                                        initVersionsDropdown(release);
+                                    } else {
+                                        $("#editionLabel").html(release.name + " " + release.latestVersion.version);
+                                    }
                                 }
                             });
                             $li.append($a);
@@ -948,12 +971,43 @@
 
                             // set default selection for release
                             if (options.edition && release.latestVersion.branchPath === options.edition) {
-                                $("#editionLabel").html(release.name + " " + release.latestVersion.version);
+                                if (options.publicBrowser) {
+                                    $("#editionLabel").html(release.name);
+                                    $("#versionLabel").html(release.latestVersion.version);
+                                    initVersionsDropdown(release);
+                                } else {
+                                    $("#editionLabel").html(release.name + " " + release.latestVersion.version);
+                                }
                             }
                         }
                     }
                 }
             }
+        }
+
+        function initVersionsDropdown(release) {
+            $.getJSON("/snowstorm/snomed-ct/codesystems/" + release.shortName + "/versions?showFutureVersions=false&showInternalReleases=false", function(result) {}).done(function(result) {
+                var $versionSwitcher = $('#versionSwitcher');
+                $versionSwitcher.html("");
+                if (result.items.length > 0) {
+                    result.items.sort(function(a, b) {
+                        return b.effectiveDate - a.effectiveDate;
+                    });
+                }
+                for (let j = 0; j < result.items.length; j++) {
+                    let version = result.items[j];
+                    var $li = $('<li>');
+                    var $a = $('<a>').append(version.version);
+                    $a.attr("href", "javascript:void(0);");
+                    $a.on("click", function() {
+                        options.edition = version.branchPath;
+                        $("#versionLabel").html(version.version);
+                        reloadCurrentPerspective();
+                    });
+                    $li.append($a);
+                    $versionSwitcher.append($li);
+                }
+            });
         }
 
         function getDefaultLanguage(defaultLanguageCode, parsedLanguages) {
@@ -1735,8 +1789,8 @@
                 if (!options.fhTaxonomyCanvasLoaded) {
                     tpt.updateCanvas();
                     options.fhTaxonomyCanvasLoaded = true;
-                }                
-            });            
+                }
+            });
 
             cdPanel1.subscribe(qpa);
             cdPanel1.subscribe(tpt);
@@ -1780,7 +1834,7 @@
                 $('#fh-tabs li:eq(1) a').tab('show');
                 $('#fh-search_canvas-searchBox').focus();
             }
-        }        
+        }
 
         function switchToResponsiveLayout(cd1Value, cd2Value, txValue1) {
             currentPerspective = "responsive";
@@ -1962,7 +2016,7 @@
         }
 
         function switchLanguage(language, flagPng, fade) {
-            if(selectedLanguage !== language) {
+            if (selectedLanguage !== language) {
                 selectedLanguage = language;
                 if (typeof(Storage) !== "undefined") {
                     localStorage.setItem("ui_language", language);
@@ -2014,6 +2068,30 @@
                     placement: 'bottom',
                     trigger: 'hover',
                     title: i18n_go_back_home,
+                    animation: true,
+                    delay: 1000
+                });
+                $("#fh-search_canvas-historyButton").tooltip().tooltip('destroy');
+                $("#fh-search_canvas-historyButton").tooltip({
+                    placement: 'left',
+                    trigger: 'hover',
+                    title: i18n_history,
+                    animation: true,
+                    delay: 1000
+                });
+                $("#fh-taxonomy_canvas-historyButton").tooltip().tooltip('destroy');
+                $("#fh-taxonomy_canvas-historyButton").tooltip({
+                    placement: 'left',
+                    trigger: 'hover',
+                    title: i18n_history,
+                    animation: true,
+                    delay: 1000
+                });
+                $("#fh-cd1_canvas-historyButton").tooltip().tooltip('destroy');
+                $("#fh-cd1_canvas-historyButton").tooltip({
+                    placement: 'left',
+                    trigger: 'hover',
+                    title: i18n_history,
                     animation: true,
                     delay: 1000
                 });
@@ -2100,6 +2178,13 @@
                                 <span class="i18n" data-i18n-id="i18n_release">Release</span>:&nbsp;<span id="editionLabel"></span> <span class="caret"></span>
                             </button>
                         <ul class="dropdown-menu" id="releaseSwitcher" role="menu">
+                        </ul>
+                    </li>
+                    <li class="navbar-btn" id="version-selector" style="display: none">
+                        <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
+                                <span class="i18n" data-i18n-id="i18n_version">Version</span>:&nbsp;<span id="versionLabel"></span> <span class="caret"></span>
+                            </button>
+                        <ul class="dropdown-menu" id="versionSwitcher" role="menu" style="max-height: 600px;overflow: auto;">
                         </ul>
                     </li>
 
@@ -2427,7 +2512,7 @@
                         <p><span class="i18n" data-i18n-id="i18n_licence_agreement_4">Use of SNOMED CT in <strong>SNOMED International SNOMED CT Browser</strong> is governed by the conditions of the following SNOMED CT license issued by the SNOMED International</span>:</p>
                         <p style="margin-left: 20px;">1. <span class="i18n" data-i18n-id="i18n_licence_agreement_5">The meaning of the terms “Affiliate”, or “Data Analysis System”, “Data Creation System”, “Derivative”, “End User”, “Extension”, “Member”, “Non-Member Territory”, “SNOMED CT” and “SNOMED CT Content” are as defined in the SNOMED International Affiliate License Agreement (see www.snomed.org/license.pdf)</span>.</p>
                         <p style="margin-left: 20px;">2. <span class="i18n" data-i18n-id="i18n_licence_agreement_6">Information about Affiliate Licensing is available at <a href="http://snomed.org/license-affiliate">http://snomed.org/license-affiliate</a>. Individuals or organizations wishing to register as SNOMED International Affiliates can register at <a href="https://mlds.ihtsdotools.org">mlds.ihtsdotools.org</a>, subject to acceptance of the Affiliate License Agreement (see <a href="http://snomed.org/license-affiliate">http://snomed.org/license-affiliate)</a></span>.</p>
-                        <p style="margin-left: 20px;">3. <span class="i18n" data-i18n-id="i18n_licence_agreement_7">The current list of SNOMED International Member Territories can be viewed at <a href="http://www.snomed.org/members">www.snomed.org/members</a>. Countries not included in that list are “Non-Member Territories”</span>.</p>
+                        <p style="margin-left: 20px;">3. <span class="i18n" data-i18n-id="i18n_licence_agreement_7">The current list of SNOMED International Member Territories can be viewed at <a href="http://snomed.org/members">snomed.org/members</a>. Countries not included in that list are “Non-Member Territories”</span>.</p>
                         <p style="margin-left: 20px;">4. <span class="i18n" data-i18n-id="i18n_licence_agreement_8">End Users, that do not hold an SNOMED International Affiliate License, may access SNOMED CT® using <strong>SNOMED International SNOMED CT Browser</strong> subject to acceptance of and adherence to the following sub-license limitations</span>:</p>
                         <p style="margin-left: 40px;">a) <span class="i18n" data-i18n-id="i18n_licence_agreement_9">The sub-licensee is only permitted to access SNOMED CT® using this software (or service) for the purpose of exploring and evaluating the terminology</span>.</p>
                         <p style="margin-left: 40px;">b) <span class="i18n" data-i18n-id="i18n_licence_agreement_10">The sub-licensee is not permitted the use of this software as part of a system that constitutes a SNOMED CT “Data Creation System” or “Data Analysis System”, as defined in the SNOMED International Affiliate License. This means that the sub-licensee must not use <strong>SNOMED International SNOMED CT Browser</strong> to add or copy SNOMED CT identifiers into any type of record system, database or document</span>.</p>

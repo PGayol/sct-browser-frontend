@@ -99,8 +99,7 @@ function conceptDetails(divElement, conceptId, options) {
     }
     panel.markerColor = panel.getNextMarkerColor(globalMarkerColor);
     
-    this.updateCdiRels = function(concept){
-        console.log(concept);
+    this.updateCdiRels = function(concept){        
         concept.relationships.forEach(function(relationship) {
             if(!relationship.target){
                 relationship.target = { fsn: {},
@@ -401,21 +400,13 @@ function conceptDetails(divElement, conceptId, options) {
             }
             result = panel.updateCdiRels(result);
             setDefaultTerm(result);
-            var pt = {};
             $.each(result.descriptions, function(i, description) {
                 if(description.effectiveTime === panel.options.historyEffective){
                     description.historyEffective = true;
-                }
-                if (description.type === 'SYNONYM' && description.lang == options.defaultLanguage && description.active) {
-                    $.each(description.acceptabilityMap, function(i, map){
-                        if(map == "PREFERRED"){
-                            pt = description;
-                        }
-                    })
-                }
+                }                
             });
-            if(pt.lang === options.defaultLanguage && options.defaultLanguage != 'en' && result.fsn.lang != options.defaultLanguage){
-                result.defaultTerm = pt.term;
+            if(options.defaultLanguage != 'en' && result.fsn.lang != options.defaultLanguage){
+                result.defaultTerm = result.pt.term;
             }
             else{
                 result.defaultTerm = result.fsn.term;
@@ -788,7 +779,7 @@ function conceptDetails(divElement, conceptId, options) {
             function copyHandler(e) {
                 if (window.getSelection().isCollapsed) {
                     if (e.srcElement && e.srcElement.value) {} else {
-                        e.clipboardData.setData('text/plain', firstMatch.conceptId + " | " + firstMatch.defaultTerm + " |");
+                        e.clipboardData.setData('text/plain', firstMatch.conceptId + " |" + firstMatch.defaultTerm + "|");
                         e.preventDefault();
                         alertEvent("Copied!", "info");
                     }
@@ -2148,9 +2139,9 @@ function conceptDetails(divElement, conceptId, options) {
             newDescriptions = englishDescriptions.concat(nonEnglishDescriptions);
         }
 
-        var homeDescriptionsHtml = "";
+        var homeDescriptionsHtml = "";        
         $.each(newDescriptions, function(i, field) {           
-            if (field.active == true) {
+            if (field.active == true && Object.keys(field.acceptabilityMap).filter(function(key) {return panel.options.defaultLanguageReferenceSets.indexOf(key) !== -1}).length > 0) {
                 if (field.active == true) {
                     if (homeDescriptionsHtml != "") {
                         homeDescriptionsHtml = homeDescriptionsHtml + "<br>";
@@ -2205,7 +2196,7 @@ function conceptDetails(divElement, conceptId, options) {
                         panel.sortDescriptions(auxDescriptions);
                         var context = {
                             options: panel.options,
-                            languageName: "(" + options.languageNameOfLangRefset[loopSelectedLangRefset] + ")",
+                            languageName: "(" + (options.languageNameOfLangRefset.hasOwnProperty(loopSelectedLangRefset) ? options.languageNameOfLangRefset[loopSelectedLangRefset] : loopSelectedLangRefset) + ")",
                             longLangName: panel.removeSemtag(panel.options.languageRefsets.filter(function (el) { return el.id == loopSelectedLangRefset;})[0].fsn.term),
                             divElementId: panel.divElement.id,
                             server: panel.server,
