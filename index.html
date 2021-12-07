@@ -466,6 +466,7 @@
         }
 
         function addEditionLinks($releaseSwitcher, releases) {
+            console.log("adding edition link: ", releases);
             for (let i = 0; i < releases.length; ++i) {
                 let release = releases[i];
                 if (typeof release.latestVersion !== 'undefined' || options.dailyBuildBrowser || options.communityBrowser) {
