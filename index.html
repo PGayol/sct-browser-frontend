@@ -11,7 +11,6 @@
 
     <script src="internal-libs/snomed-interaction-components.min.js?version=build_version"></script>
     <script type="text/javascript" src="ecl-builder/ecl-builder.js"></script>
-    <script src="external-libs/bootbox.min.js"></script>
 
     <link rel="stylesheet" type="text/css" href="ecl-builder/styles.css">
     <link rel="stylesheet" type="text/css" href="css/external.css">
@@ -199,7 +198,7 @@
                 options.communityBrowser = true;
             } else if (window.location.hostname.includes('concrete') || window.location.hostname.includes('preview')) {
                 options.previewBrowser = true;
-            } else if (window.location.hostname.includes('browser') && !options.dailyBuildBrowser) {
+            } else if (window.location.hostname.includes('browser')) {
                 options.publicBrowser = true;
             } else {
                 // do nothing
@@ -312,12 +311,6 @@
                     } else if (options.communityBrowser) {
                         addEditionLinks($('#commnunity_content_editions'), options.communityContentReleases)
                     } else if (options.dailyBuildBrowser) {
-                        if (localReleases && localReleases.length) {
-                            localReleases.forEach(function (localRelease) {
-                                localRelease.isOfficialRelease = true;
-                                dailyBuildLocal.push(localRelease);
-                            });       
-                        }
                         addEditionLinks($('#dailybuild_editions'), dailyBuildInternational);
                         addEditionLinks($('#dailybuild_local_editions'), dailyBuildLocal);
                     } else {
@@ -481,25 +474,14 @@
                     var $span1 = $('<span>').attr("class", "i18n").attr("data-i18n-id", "i18n_go_browsing");
                     $span1.text("Go browsing...");
                     var $span2 = $('<span>').attr("class", "small");
-                    if (options.dailyBuildBrowser && !release.isOfficialRelease) {
+                    if (options.dailyBuildBrowser) {
                         $span2.append(release.name + "<br>DAILY BUILD");
                         $("#editionLabel").html(release.name + " DAILY BUILD");
                     } else if (options.communityBrowser) {
                         $span2.append(release.name + "<br>Community Content");
                         $("#editionLabel").html(release.name + " Community Content");
                     } else {
-                        if (!release.latestVersion) {
-                            release.latestVersion = {
-                               "shortName":"CA-20210930",
-                               "importDate":"2021-10-07T00:58:20.591Z",
-                               "parentBranchPath":"MAIN/2021-09-30",
-                               "effectiveDate": 20210930,
-                               "version":"2021-09-30",
-                               "description":"SNOMEDCT 20210930 import.",
-                               "branchPath":"MAIN/2021-09-30/RELEASE"
-                            }
-                        }
-                       $span2.append(release.name + "<br>" + release.latestVersion.version);  
+                        $span2.append(release.name + "<br>" + release.latestVersion.version);
                     }
 
                     var $a = $('<a>').attr("class", "btn btn-primary btn-lg").attr("role", "button").attr("style", "margin-bottom : 15px");
@@ -565,8 +547,7 @@
                             switchLanguage(selectedLanguageAndFlag.selectedLanguage, selectedLanguageAndFlag.selectedFlag, false);
                         });
                     }
-                    console.log($releaseSwitcher);
-                    console.log($a);
+
                     $releaseSwitcher.append($a);
                     $releaseSwitcher.append(" ");
                 }
@@ -2320,7 +2301,7 @@
                 <!--<a class="btn btn-primary btn-lg" role="button" onclick="switchRelease('Daily Build Edition 20200131', 'en-edition', 'v20200131', '', '900000000000509007', 'https://prod-dailybuild.ihtsdotools.org/api/snomed');switchToFullHeight(404684003, 138875005);"><img src="img/box-logo.png" style="height:20px">&nbsp;&nbsp;&nbsp;<span class="i18n" data-i18n-id="i18n_start_browsing">Start browsing...</span><br><span class="small">Daily Build edition</span></a>-->
                 </p>
                 <p id="lastUpdatedText"></p>
-                <!-- <h3>Other Daily Builds:</h3> -->
+                <h3>Other Daily Builds:</h3>
                 <p id="dailybuild_local_editions" style="margin-bottom : 0px"></p>
             </div>
             <p><span class="i18n" data-i18n-id="i18n_home6"><span class="btn-success"><em>Releases</em></span> will allow the selection of SNOMED CT content from the International Edition or other extensions, with specific dates.</span>
