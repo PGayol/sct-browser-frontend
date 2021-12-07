@@ -228,9 +228,16 @@
                 var dfd = $.Deferred();
 
                 $.getJSON("/snowstorm/snomed-ct/codesystems", function(result) {}).done(function(result) {
+                    var dailyBuilds = [];
+                    result.forEach(function(release) {
+                        if (release.dailyBuildAvailable) {
+                            dailyBuilds.push(release);
+                        }
+                    });
+
                     options.serverUrl = "/snowstorm/snomed-ct";
                     options.queryServerUrl = "/snowstorm/snomed-ct";
-                    options.releases = result;
+                    options.releases = dailyBuilds;
 
                     const internationalEditionShortNames = ['SNOMEDCT', 'SNOMEDCT-ES'];
                     // sort extensions. International and Spanish Editions are always on Top
