@@ -485,8 +485,8 @@
                     $span1.text("Go browsing...");
                     var $span2 = $('<span>').attr("class", "small");
                     if (options.dailyBuildBrowser) {
-                        $span2.append(release.name + "<br>DAILY BUILD");
-                        $("#editionLabel").html(release.name + " DAILY BUILD");
+                        $span2.append(release.name + "<br>Daily Build");
+                        $("#editionLabel").html(release.name + " Daily Build");
                     } else if (options.communityBrowser) {
                         $span2.append(release.name + "<br>Community Content");
                         $("#editionLabel").html(release.name + " Community Content");
@@ -557,19 +557,20 @@
                             switchLanguage(selectedLanguageAndFlag.selectedLanguage, selectedLanguageAndFlag.selectedFlag, false);
                         });
                     }
-
+                    $releaseSwitcher.append('<h3>Daily builds</h3>');
                     $releaseSwitcher.append($a);
                     $releaseSwitcher.append(" ");
                 }
             }
             if (addLinkToSnomedBrowser && addLinkToSnomedBrowser != "") {
                 var snomedInternationalBrowserButton = '<a class="btn btn-primary btn-lg" role="button" style="margin-bottom : 15px" target="_blank" href="' + addLinkToSnomedBrowser + '"><img src="img/logo.png" style="height:20px">&nbsp;&nbsp;&nbsp;<span class="i18n" data-i18n-id="i18n_go_browsing">Go browsing...</span><br><span class="small">SNOMED International <br> Browser</span></a>';
-                var multiBrowserButton = '<a class="btn btn-primary btn-lg" role="button" style="margin-bottom : 15px; margin-left: 5px;" target="_blank" href="' + 'https://browser.ihtsdotools.org/multi-extension-search.html' + '">&nbsp;&nbsp;&nbsp;<span class="i18n" data-i18n-id="i18n_go_browsing">Go browsing...</span><br><span class="small">SNOMED International <br> Multibrowser</span></a>';
-                var internationalDailyBUildButton = '<a class="btn btn-primary btn-lg" role="button" style="margin-bottom : 15px; margin-left: 5px;" target="_blank" href="' + 'https://dailybuild.ihtsdotools.org/' + '">&nbsp;&nbsp;&nbsp;<span class="i18n" data-i18n-id="i18n_go_browsing">Go browsing...</span><br><span class="small">SNOMED International <br> Daily Build Browser</span></a>'
-                var releaseDashboardButton = '<p><b>Visit <a target="_blank" href="http://informs.infoway-inforoute.ca/secure/Dashboard.jspa?selectPageId=11900"> Canada Infoway Snomed CT Releases Dashboard. </a> </b></p>'
+                var multiBrowserButton = '<a class="btn btn-primary btn-lg" role="button" style="margin-bottom : 15px; margin-left: 5px;" target="_blank" href="' + 'https://browser.ihtsdotools.org/multi-extension-search.html' + '"><img src="img/logo.png" style="height:20px">&nbsp;&nbsp;&nbsp;<span class="i18n" data-i18n-id="i18n_go_browsing">Go browsing...</span><br><span class="small">SNOMED International <br> Multi Extension Browser</span></a>';
+                var internationalDailyBuildButton = '<a class="btn btn-primary btn-lg" role="button" style="margin-bottom : 15px; margin-left: 5px;" target="_blank" href="' + 'https://dailybuild.ihtsdotools.org/' + '"><img src="img/logo.png" style="height:20px">&nbsp;&nbsp;&nbsp;<span class="i18n" data-i18n-id="i18n_go_browsing">Go browsing...</span><br><span class="small">SNOMED International <br> Daily Build Browser</span></a>';
+                var releaseDashboardButton = '<p><b>Visit <a target="_blank" href="http://informs.infoway-inforoute.ca/secure/Dashboard.jspa?selectPageId=11900"> Canada Infoway Snomed CT Releases Dashboard </a> </b></p>'
+                $releaseSwitcher.append(internationalDailyBuildButton + '<br>');
+                $releaseSwitcher.append('<h3>Published editions</h3>');
                 $releaseSwitcher.append(snomedInternationalBrowserButton);
                 $releaseSwitcher.append(multiBrowserButton);
-                $releaseSwitcher.append(internationalDailyBUildButton);
                 $releaseSwitcher.append('<br>');
                 $releaseSwitcher.append(releaseDashboardButton);
 
@@ -2318,7 +2319,7 @@
                 <!-- <p>This is a browser for the SNOMED CT Daily Build.</p> -->
                 <h2><span class="text-warning">IMPORTANT NOTICE – PLEASE READ THE FOLLOWING CAREFULLY</span></h2>
                 <p>Canada Health Infoway’s SNOMED CT® Canadian Edition Daily Build Browser (the “Browser”) is a development environment that provides ways to browse and search SNOMED CT Canadian Edition English and French content that has not been published.</p>
-                <p>Anyone downloading, accessing or using any part of the Browser must have agreed to be bound by the terms of the applicable SNOMED CT license agreements..</p>
+                <p>Anyone downloading, accessing or using any part of the Browser must have agreed to be bound by the terms of the applicable SNOMED CT license agreements.</p>
                 <p>The Browser contains a test build of terminology for reference purposes only. The interface and REST APIs are not to be used as part of production systems in health care settings.</p>
                 <p>Users should have no expectation of continuity of identifiers, fully specified names, descriptions, or relationships as these are subject to change until publication.</p>
                 <p>Any abuse of the REST APIs may result in the offending IP address being banned from accessing the Browser in addition to any other action deemed appropriate by Infoway in its sole discretion.</p>
