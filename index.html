@@ -279,7 +279,6 @@
                                 release.defaultAcceptLanguage = 'en-X-271000210107';
                             }
                             if (internationalEditionShortNames.indexOf(release.shortName) > -1) {
-                                console.log("a");
                                 if (release.shortName === 'SNOMEDCT') {
                                     release.stats = true;
                                     release.mrcm = true;
@@ -292,14 +291,15 @@
                                     dailyBuildInternational.push(release);
                                 }
                             } else {
-                                console.log("b");
                                 if (release.maintainerType && release.maintainerType === 'Community Content') {
                                     options.communityContentReleases.push(release);
                                 } else {
                                     localReleases.push(release);
                                     if (release.dailyBuildAvailable) {
                                         options.dailyBuildReleases.push(release);
-                                        dailyBuildLocal.push(release);
+                                        // dailyBuildLocal.push(release);
+                                        dailyBuildInternational.push(release);
+
                                     }
                                 }
                             }
@@ -322,8 +322,6 @@
                     } else if (options.communityBrowser) {
                         addEditionLinks($('#commnunity_content_editions'), options.communityContentReleases)
                     } else if (options.dailyBuildBrowser) {
-                        console.log(1);
-                        console.log(dailyBuildInternational);
                         var addLinkToSnomedBrowser = "https://browser.ihtsdotools.org/";
                         addEditionLinks($('#dailybuild_editions'), dailyBuildInternational, addLinkToSnomedBrowser);
                         // addEditionLinks($('#dailybuild_local_editions'), dailyBuildLocal);
