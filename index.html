@@ -279,6 +279,7 @@
                                 release.defaultAcceptLanguage = 'en-X-271000210107';
                             }
                             if (internationalEditionShortNames.indexOf(release.shortName) > -1) {
+                                console.log("a");
                                 if (release.shortName === 'SNOMEDCT') {
                                     release.stats = true;
                                     release.mrcm = true;
@@ -291,6 +292,7 @@
                                     dailyBuildInternational.push(release);
                                 }
                             } else {
+                                console.log("b");
                                 if (release.maintainerType && release.maintainerType === 'Community Content') {
                                     options.communityContentReleases.push(release);
                                 } else {
