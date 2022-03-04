@@ -320,6 +320,8 @@
                     } else if (options.communityBrowser) {
                         addEditionLinks($('#commnunity_content_editions'), options.communityContentReleases)
                     } else if (options.dailyBuildBrowser) {
+                        console.log(1);
+                        console.log(dailyBuildInternational);
                         var addLinkToSnomedBrowser = "https://browser.ihtsdotools.org/";
                         addEditionLinks($('#dailybuild_editions'), dailyBuildInternational, addLinkToSnomedBrowser);
                         // addEditionLinks($('#dailybuild_local_editions'), dailyBuildLocal);
