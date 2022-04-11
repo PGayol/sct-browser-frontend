@@ -491,8 +491,8 @@
                         $span2.append(release.name + "<br>Daily Build");
                         $("#editionLabel").html(release.name + " Daily Build");
                         $.getJSON("/snowstorm/snomed-ct/branches/" + release.branchPath, function(result) {}).done(function(result) {
-                            var date = "No info available";
-                            if (result && result.length && result[0] && result[0].head) {
+                            var date = "---";
+                            if (result && result.head) {
                                 date = new Date(result[0].head);
                             }
                             $("#lastUpdateTimeFromSnowstorm").text(date);
@@ -2353,7 +2353,7 @@
         <!-- Welcome Perspective DailyBuild -->
         <div id="welcome-perspective-dailybuild" class="bperspective">
             <div class="jumbotron">
-                <div><h3 id="lastUpdateTime" class="i18n"  data-i18n-id="i18n_last_update_time">Last updated: </h3> <h3 id="lastUpdateTimeFromSnowstorm"></h3></div>
+                <div><h3 style="display: inline;" id="lastUpdateTime" class="i18n"  data-i18n-id="i18n_last_update_time">Last updated: </h3> <h3 style="display: inline;" id="lastUpdateTimeFromSnowstorm"></h3></div>
                 <h1>Canada Health Infoway’s SNOMED CT® Canadian Edition Daily Build Browser</h1>
                 <!-- <p>This is a browser for the SNOMED CT Daily Build.</p> -->
                 <h2><span class="text-warning" class="i18n" data-i18n-id="i18n_canada_home_notice">IMPORTANT NOTICE – PLEASE READ THE FOLLOWING CAREFULLY</span></h2>
