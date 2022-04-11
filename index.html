@@ -491,11 +491,11 @@
                         $span2.append(release.name + "<br>Daily Build");
                         $("#editionLabel").html(release.name + " Daily Build");
                         $.getJSON("/snowstorm/snomed-ct/branches/" + release.branchPath, function(result) {}).done(function(result) {
-                            var date = "---";
+                            var date = "***";
                             if (result && result.head) {
                                 date = new Date(result[0].head);
                             }
-                            $("#lastUpdateTimeFromSnowstorm").text(date);
+                            $("#lastUpdateTimeFromSnowstorm").text(date.toString());
                         });
                     } else if (options.communityBrowser) {
                         $span2.append(release.name + "<br>Community Content");
