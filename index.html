@@ -477,6 +477,7 @@
             }
         }
 
+
         function addEditionLinks($releaseSwitcher, releases, addLinkToSnomedBrowser) {
             for (let i = 0; i < releases.length; ++i) {
                 let release = releases[i];
@@ -519,6 +520,13 @@
                             if (options.dailyBuildBrowser) {
                                 options.edition = release.branchPath;
                                 $("#editionLabel").html(release.name + " DAILY BUILD");
+                                $.getJSON("/snowstorm/snomed-ct/branches/" + release.branchPath, function(result) {}).done(function(result) {
+                                    var date = "No info available";
+                                    if (result && result.length && result[0] && result[0].head) {
+                                        date = new Date(result[0].head);
+                                    }
+                                    $("#lastUpdateTimeFromSnowstorm").text(date);
+                                })
                             } else if (options.communityBrowser) {
                                 options.edition = release.branchPath;
                                 $("#editionLabel").html(release.name + " Community Content");
@@ -2152,6 +2160,26 @@
     </style>
 </head>
 
+<div class="modal" id="feedbackModal" tabindex="-1" role="dialog" aria-labelledby="feedbackModal">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title i18n" data-i18n-id="i18n_feedback_title">Feedback</h4>
+        </div>
+        <div class="modal-body">
+            <h3 style="text-align: center;"><large class="i18n" data-i18n-id="i18n_feedback_modal_content">
+                Your feedback is essential to the evolution and improvement of this service.
+                Please provide any feedback by clicking on the feedback button at the top of the page or by emailing us at <a href="mailto:standards@infoway-inforoute.ca">standards@infoway-inforoute.ca.</a>
+            </large></h3> 
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 <body onLoad="getCopyrightYear(); determineServer();" style="height: 100%; display: block;">
     <div id="cookiescript" style="top: 0px; background-color: rgb(17, 17, 17); z-index: 999999; opacity: 1; position: fixed; padding: 15px 0px; width: 100%; left: 0px; font-size: 13px; font-weight: normal; text-align: left; letter-spacing: normal; color: rgb(0, 0, 0); font-family: Arial, sans-serif; box-shadow: rgb(0, 0, 0) 0px 0px 8px; display: none;">
         <div style="margin: 0px 10px; font-size: 13px; font-weight: bold; text-align: center; color: rgb(255, 255, 255); font-family: Arial, sans-serif; line-height: 23px; letter-spacing: normal;">This website uses cookies to improve user experience. By using our website you consent to all cookies in accordance with our Cookie Policy. &nbsp;&nbsp;
@@ -2208,10 +2236,18 @@
                     </li>
 
                     <li class="navbar-btn feedback-button">
-                        <button type="button" class="btn btn-info" onclick="FreshWidget.show();
+                        <!-- <button type="button" class="btn btn-info" onclick="FreshWidget.show();
                                     return false;">
                                 <span class="i18n" data-i18n-id="i18n_feedback">Feedback</span>
-                            </button>
+                            </button> -->
+                        <button type="button" class="btn btn-info" id="feedbackButton"  data-toggle="modal" data-target="#feedbackModal" >
+                            <span class="i18n"data-i18n-id="i18n_feedback">Feedback</span>
+                        </button>
+                        <!-- <script type="text/javascript">
+                            $("#feedbackButton").click(function() {
+                                console.log('hey');
+                            })
+                        </script>   -->
                     </li>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="i18n" data-i18n-id="i18n_about">Help</span> <b class="caret"></b></a>
@@ -2315,6 +2351,7 @@
         </div>
 
         <!-- Welcome Perspective DailyBuild -->
+       <div><p id="lastUpdateTime" class="i18n"  data-i18n-id="i18n_last_update_time">Last updated: </p> <p id="lastUpdateTimeFromSnowstorm"></p></div>
         <div id="welcome-perspective-dailybuild" class="bperspective">
             <div class="jumbotron">
                 <h1>Canada Health Infoway’s SNOMED CT® Canadian Edition Daily Build Browser</h1>
