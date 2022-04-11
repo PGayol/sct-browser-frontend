@@ -493,7 +493,7 @@
                         $.getJSON("/snowstorm/snomed-ct/branches/" + release.branchPath, function(result) {}).done(function(result) {
                             var date = "***";
                             if (result && result.head) {
-                                date = new Date(result[0].head);
+                                date = new Date(result.head);
                             }
                             $("#lastUpdateTimeFromSnowstorm").text(date.toString());
                         });
