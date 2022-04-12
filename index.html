@@ -489,7 +489,7 @@
                     var $span2 = $('<span>').attr("class", "small");
                     if (options.dailyBuildBrowser) {
                         $span2.append(release.name + "<br>Daily Build");
-                        $("#editionLabel").html(release.name + " Daily Build");
+                        $("#editionLabel").html(release.name + ' <p class="i18n" data-i18n-id="i18n_daily_build">Daily Build</p>');
                         $.getJSON("/snowstorm/snomed-ct/branches/" + release.branchPath, function(result) {}).done(function(result) {
                             var date = "***";
                             if (result && result.head) {
@@ -526,7 +526,7 @@
                             parsedLanguages = parsedLanguages.slice(0, -1);
                             if (options.dailyBuildBrowser) {
                                 options.edition = release.branchPath;
-                                $("#editionLabel").html(release.name + " DAILY BUILD");
+                                $("#editionLabel").html(release.name + ' <p class="i18n" data-i18n-id="i18n_feedback"> DAILY BUILD </p>"');
                             } else if (options.communityBrowser) {
                                 options.edition = release.branchPath;
                                 $("#editionLabel").html(release.name + " Community Content");
@@ -889,7 +889,7 @@
                             options.languages = parsedLanguages;
                             options.languageObject = release.languages;
                             options.editionShortname = release.shortName;
-                            $("#editionLabel").html(release.name + (options.dailyBuildBrowser ? " DAILY BUILD" : ' Community Content'));
+                            $("#editionLabel").html(release.name + (options.dailyBuildBrowser ? '<p class="i18n" data-i18n-id="i18n_daily_build"> DAILY BUILD </p>' : ' Community Content'));
                             options.defaultLanguageReferenceSets = release.defaultLanguageReferenceSets ? release.defaultLanguageReferenceSets : [];
                             options.modules = release.modules;
                             options.defaultLanguage = getDefaultLanguage(release.defaultLanguageCode, parsedLanguages);
@@ -905,7 +905,7 @@
 
                         // set default selection for release
                         if (options.edition && release.branchPath === options.edition) {
-                            $("#editionLabel").html(release.name + (options.dailyBuildBrowser ? " DAILY BUILD" : ' Community Content'));
+                            $("#editionLabel").html(release.name + (options.dailyBuildBrowser ? '<p class="i18n" data-i18n-id="i18n_daily_build"> DAILY BUILD </p>' : ' Community Content'));
                         }
                     }
                 }
@@ -2266,21 +2266,21 @@
                             <li>
                                 <a href="javascript:void(0);" onclick="switchLanguage('en', 'img/flags/us.png', true);"><img src="img/flags/us.png" /> English</a>
                             </li>
-                            <li>
+                            <!-- <li>
                                 <a href="javascript:void(0);" onclick="switchLanguage('da', 'img/flags/dk.png', true);"><img src="img/flags/dk.png" /> Dansk</a>
                             </li>
                             <li>
                                 <a href="javascript:void(0);" onclick="switchLanguage('es', 'img/flags/es.png', true);"><img src="img/flags/es.png" /> Español</a>
-                            </li>
+                            </li> -->
                             <li>
                                 <a href="javascript:void(0);" onclick="switchLanguage('fr', 'img/flags/fr.png', true);"><img src="img/flags/fr.png" /> Français</a>
                             </li>
-                            <li>
+                            <!-- <li>
                                 <a href="javascript:void(0);" onclick="switchLanguage('pt', 'img/flags/pt.png', true);"><img src="img/flags/pt.png" /> Português</a>
                             </li>
                             <li>
                                 <a href="javascript:void(0);" onclick="switchLanguage('sv', 'img/flags/se.png', true);"><img src="img/flags/se.png" /> Swedish</a>
-                            </li>
+                            </li> -->
                             <li class="divider"></li>
                             <li style="margin: 5px;"><em><span class="i18n text-muted small" data-i18n-id="i18n_translation_warning">This option only applies to the Browser. Terminology language depends on the selected edition.</span></em></li>
                         </ul>
