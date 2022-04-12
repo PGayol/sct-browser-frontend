@@ -489,7 +489,7 @@
                     var $span2 = $('<span>').attr("class", "small");
                     if (options.dailyBuildBrowser) {
                         $span2.append(release.name + "<br>Daily Build");
-                        $("#editionLabel").html(release.name + ' <p class="i18n" data-i18n-id="i18n_daily_build">Daily Build</p>');
+                        $("#editionLabel").html(release.name + ' <p style="display: inline;" class="i18n" data-i18n-id="i18n_daily_build">Daily Build</p>');
                         $.getJSON("/snowstorm/snomed-ct/branches/" + release.branchPath, function(result) {}).done(function(result) {
                             var date = "***";
                             if (result && result.head) {
@@ -889,7 +889,7 @@
                             options.languages = parsedLanguages;
                             options.languageObject = release.languages;
                             options.editionShortname = release.shortName;
-                            $("#editionLabel").html(release.name + (options.dailyBuildBrowser ? '<p class="i18n" data-i18n-id="i18n_daily_build"> DAILY BUILD </p>' : ' Community Content'));
+                            $("#editionLabel").html(release.name + (options.dailyBuildBrowser ? '<p style="display: inline;" class="i18n" data-i18n-id="i18n_daily_build"> DAILY BUILD </p>' : ' Community Content'));
                             options.defaultLanguageReferenceSets = release.defaultLanguageReferenceSets ? release.defaultLanguageReferenceSets : [];
                             options.modules = release.modules;
                             options.defaultLanguage = getDefaultLanguage(release.defaultLanguageCode, parsedLanguages);
@@ -905,7 +905,7 @@
 
                         // set default selection for release
                         if (options.edition && release.branchPath === options.edition) {
-                            $("#editionLabel").html(release.name + (options.dailyBuildBrowser ? '<p class="i18n" data-i18n-id="i18n_daily_build"> DAILY BUILD </p>' : ' Community Content'));
+                            $("#editionLabel").html(release.name + (options.dailyBuildBrowser ? '<p  style="display: inline;" class="i18n" data-i18n-id="i18n_daily_build"> DAILY BUILD </p>' : ' Community Content'));
                         }
                     }
                 }
