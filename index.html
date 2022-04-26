@@ -532,7 +532,7 @@
                                 options.edition = release.branchPath;
                                 var ui_lang = localStorage.getItem("ui_language");
                                 var daily_build_text = ui_lang == "fr" ? 'Version Quotidienne' : 'Daily Build'
-                                $("#editionLabel").html(release.name + ' <p class="i18n" data-i18n-id="i18n_daily_build"> ' + daily_build_text + ' </p>');
+                                $("#editionLabel").html(release.name + ' <p style="display: inline;"  class="i18n" data-i18n-id="i18n_daily_build"> ' + daily_build_text + ' </p>');
                             } else if (options.communityBrowser) {
                                 options.edition = release.branchPath;
                                 $("#editionLabel").html(release.name + " Community Content");
@@ -873,7 +873,7 @@
                         var $li = $('<li>');
                         var ui_lang = localStorage.getItem("ui_language");
                         var daily_build_text = ui_lang == "fr" ? 'Version Quotidienne' : 'Daily Build'
-                        var $a = $('<a>').attr("shortName", release.shortName).append(release.name + " ").append('<span style="color: dodgerblue;">' + (options.dailyBuildBrowser ? '<p  style="display: inline;" class="i18n" data-i18n-id="i18n_daily_build"> ' + daily_build_text + ' </p>' : 'Community Content') + '</span>');
+                        var $a = $('<a>').attr("shortName", release.shortName).append(release.name + " ").append('<span style="color: dodgerblue;">' + (options.dailyBuildBrowser ? '<p style="display: inline;" class="i18n" data-i18n-id="i18n_daily_build"> ' + daily_build_text + ' </p>' : 'Community Content') + '</span>');
                         $a.attr("href", "javascript:void(0);");
                         $a.on("click", function() {
                             var parsedLanguages = "";
