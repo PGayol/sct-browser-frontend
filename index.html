@@ -530,7 +530,9 @@
                             parsedLanguages = parsedLanguages.slice(0, -1);
                             if (options.dailyBuildBrowser) {
                                 options.edition = release.branchPath;
-                                $("#editionLabel").html(release.name + ' <p class="i18n" data-i18n-id="i18n_daily_build"> DAILY BUILD </p>');
+                                var ui_lang = localStorage.getItem("ui_language");
+                                var daily_build_text = ui_lang == "fr" ? 'Version Quotidienne' : 'Daily Build'
+                                $("#editionLabel").html(release.name + ' <p class="i18n" data-i18n-id="i18n_daily_build"> ' + daily_build_text + ' </p>');
                             } else if (options.communityBrowser) {
                                 options.edition = release.branchPath;
                                 $("#editionLabel").html(release.name + " Community Content");
