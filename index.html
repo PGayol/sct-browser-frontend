@@ -526,7 +526,7 @@
                             parsedLanguages = parsedLanguages.slice(0, -1);
                             if (options.dailyBuildBrowser) {
                                 options.edition = release.branchPath;
-                                $("#editionLabel").html(release.name + ' <p class="i18n" data-i18n-id="i18n_daily_build"> DAILY BUILD </p>"');
+                                $("#editionLabel").html(release.name + ' <p class="i18n" data-i18n-id="i18n_daily_build"> DAILY BUILD </p>');
                             } else if (options.communityBrowser) {
                                 options.edition = release.branchPath;
                                 $("#editionLabel").html(release.name + " Community Content");
@@ -2354,7 +2354,7 @@
         <div id="welcome-perspective-dailybuild" class="bperspective">
             <div class="jumbotron">
                 <div><h4 style="display: inline;" id="lastUpdateTime" class="i18n"  data-i18n-id="i18n_last_update_time">Last updated: </h4> <h4 style="display: inline;" id="lastUpdateTimeFromSnowstorm"></h4></div>
-                <h1 class="i18n" data+i18-id="i18m_canada_title">Canada Health Infoway’s SNOMED CT® Canadian Edition Daily Build Browser</h1>
+                <h1 class="i18n" data-i18n-id="i18m_canada_title">Canada Health Infoway’s SNOMED CT® Canadian Edition Daily Build Browser</h1>
                 <!-- <p>This is a browser for the SNOMED CT Daily Build.</p> -->
                 <h2><span class="text-warning" class="i18n" data-i18n-id="i18n_canada_home_notice">IMPORTANT NOTICE – PLEASE READ THE FOLLOWING CAREFULLY</span></h2>
                 <p class="i18n" data-i18n-id="i18n_canada_home1">Canada Health Infoway’s SNOMED CT® Canadian Edition Daily Build Browser (the “Browser”) is a development environment that provides ways to browse and search SNOMED CT Canadian Edition English and French content that has not been published.</p>
@@ -2379,7 +2379,7 @@
                 <h2><span class="text-warning i18n" data-i18n-id="i18n_feedback_title">FEEDBACK</span></h2>
                 <p><small class="i18n" data-i18n-id="i18n_feedback_content">
 Your feedback is essential to the evolution and improvement of this service.
-Please provide any feedback by clicking on the feedback button at the top of the page or by emailing us at <a href="mailto:standards@infoway-inforoute.ca">standards@infoway-inforoute.ca.</a>
+Please provide any feedback by clicking on the feedback button at the top of the page or by emailing us at <a href="mailto:standards@infoway-inforoute.ca">standards@infoway-inforoute.ca</a>
                 </small></p> 
             </div>
             <p><span class="i18n" data-i18n-id="i18n_home6"><span class="btn-success"><em>Releases</em></span> will allow the selection of SNOMED CT content from the International Edition or other extensions, with specific dates.</span>
@@ -2594,7 +2594,7 @@ Please provide any feedback by clicking on the feedback button at the top of the
                             <li class="pull-left">
                                 <a href="javascript:void(0);" onclick="switchLanguage('en', 'img/flags/us.png', true);"><img src="img/flags/us.png" /> English</a>
                             </li>
-                            <li>
+                            <li class="pull-left">
                                 <a href="javascript:void(0);" onclick="switchLanguage('fr', 'img/flags/fr.png', true);"><img src="img/flags/fr.png" /> Français</a>
                             </li>
                             <!-- <li class="pull-left">
