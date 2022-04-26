@@ -499,7 +499,7 @@
                             var ui_lang = localStorage.getItem("ui_language");
                             var date_lang = ui_lang == "fr" ? 'fr-CA' : 'en-US'
                             options.lastUpdateTimeFromSnowstorm = date;
-                            $("#lastUpdateTimeFromSnowstorm").text(date.toLocaleDateString(date_lang, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }));
+                            $("#lastUpdateTimeFromSnowstorm").text(date.toLocaleString(date_lang, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }));
                         });
                     } else if (options.communityBrowser) {
                         $span2.append(release.name + "<br>Community Content");
@@ -2042,7 +2042,8 @@
                 if (options.lastUpdateTimeFromSnowstorm && options.lastUpdateTimeFromSnowstorm !== '') {
                     var ui_lang = localStorage.getItem("ui_language");
                     var date_lang = ui_lang == "fr" ? 'fr-CA' : 'en-US'
-                    $("#lastUpdateTimeFromSnowstorm").text(options.lastUpdateTimeFromSnowstorm.toLocaleDateString(date_lang, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }));
+                    // $("#lastUpdateTimeFromSnowstorm").text(options.lastUpdateTimeFromSnowstorm.toLocaleDateString(date_lang, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }));
+                    $("#lastUpdateTimeFromSnowstorm").text(options.lastUpdateTimeFromSnowstorm.toLocaleString(date_lang, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }));
                 }
                 $("#nav-selected-flag").html('<img src="' + flagPng + '">');
                 $("#nav-selected-flag-modal").html('<img src="' + flagPng + '">');
