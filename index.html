@@ -869,7 +869,7 @@
                     for (let i = 0; i < releases.length; ++i) {
                         let release = releases[i];
                         var $li = $('<li>');
-                        var $a = $('<a>').attr("shortName", release.shortName).append(release.name + " ").append('<span style="color: dodgerblue;">' + (options.dailyBuildBrowser ? 'DAILY BUILD' : 'Community Content') + '</span>');
+                        var $a = $('<a>').attr("shortName", release.shortName).append(release.name + " ").append('<span style="color: dodgerblue;">' + (options.dailyBuildBrowser ? '<p  style="display: inline;" class="i18n" data-i18n-id="i18n_daily_build"> DAILY BUILD </p>' : 'Community Content') + '</span>');
                         $a.attr("href", "javascript:void(0);");
                         $a.on("click", function() {
                             var parsedLanguages = "";
