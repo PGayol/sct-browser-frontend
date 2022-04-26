@@ -2037,6 +2037,9 @@
                 if (typeof(Storage) !== "undefined") {
                     localStorage.setItem("ui_language", language);
                 }
+                var ui_lang = localStorage.getItem("ui_language");
+                var date_lang = ui_lang == "fr" ? 'fr-CA' : 'en-US'
+                $("#lastUpdateTimeFromSnowstorm").text(date.toLocaleDateString(date_lang, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }));
                 $("#nav-selected-flag").html('<img src="' + flagPng + '">');
                 $("#nav-selected-flag-modal").html('<img src="' + flagPng + '">');
                 jQuery.i18n.properties({
