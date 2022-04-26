@@ -495,7 +495,7 @@
                             if (result && result.head) {
                                 date = new Date(result.head);
                             }
-                            $("#lastUpdateTimeFromSnowstorm").text(date.toString());
+                            $("#lastUpdateTimeFromSnowstorm").text(date.toLocaleDateString());
                         });
                     } else if (options.communityBrowser) {
                         $span2.append(release.name + "<br>Community Content");
@@ -526,7 +526,7 @@
                             parsedLanguages = parsedLanguages.slice(0, -1);
                             if (options.dailyBuildBrowser) {
                                 options.edition = release.branchPath;
-                                $("#editionLabel").html(release.name + ' <p class="i18n" data-i18n-id="i18n_feedback"> DAILY BUILD </p>"');
+                                $("#editionLabel").html(release.name + ' <p class="i18n" data-i18n-id="i18n_daily_build"> DAILY BUILD </p>"');
                             } else if (options.communityBrowser) {
                                 options.edition = release.branchPath;
                                 $("#editionLabel").html(release.name + " Community Content");
@@ -567,7 +567,7 @@
                             switchLanguage(selectedLanguageAndFlag.selectedLanguage, selectedLanguageAndFlag.selectedFlag, false);
                         });
                     }
-                    $releaseSwitcher.append('<h3>Daily builds</h3>');
+                    $releaseSwitcher.append('<h3 class="i18n" data-i18n-id="i18n_daily_builds">Daily builds</h3>');
                     $releaseSwitcher.append($a);
                     $releaseSwitcher.append(" ");
                 }
@@ -576,9 +576,9 @@
                 var snomedInternationalBrowserButton = '<a class="btn btn-primary btn-lg" role="button" style="margin-bottom : 15px" target="_blank" href="' + addLinkToSnomedBrowser + '"><img src="img/logo.png" style="height:20px">&nbsp;&nbsp;&nbsp;<span class="i18n" data-i18n-id="i18n_go_browsing">Go browsing...</span><br><span class="small">SNOMED International <br> Browser</span></a>';
                 var multiBrowserButton = '<a class="btn btn-primary btn-lg" role="button" style="margin-bottom : 15px; margin-left: 5px;" target="_blank" href="' + 'https://browser.ihtsdotools.org/multi-extension-search.html' + '"><img src="img/logo.png" style="height:20px">&nbsp;&nbsp;&nbsp;<span class="i18n" data-i18n-id="i18n_go_browsing">Go browsing...</span><br><span class="small">SNOMED International <br> Multi Extension Browser</span></a>';
                 var internationalDailyBuildButton = '<a class="btn btn-primary btn-lg" role="button" style="margin-bottom : 15px; margin-left: 5px;" target="_blank" href="' + 'https://dailybuild.ihtsdotools.org/' + '"><img src="img/logo.png" style="height:20px">&nbsp;&nbsp;&nbsp;<span class="i18n" data-i18n-id="i18n_go_browsing">Go browsing...</span><br><span class="small">SNOMED International <br> Daily Build Browser</span></a>';
-                var releaseDashboardButton = '<p><b>Visit <a target="_blank" href="http://informs.infoway-inforoute.ca/secure/Dashboard.jspa?selectPageId=11900"> Canada Infoway Snomed CT Releases Dashboard </a> </b></p>'
+                var releaseDashboardButton = '<p><b class="i18n" data-i18n-id="i18n_visit_dashboard">Visit <a target="_blank" href="http://informs.infoway-inforoute.ca/secure/Dashboard.jspa?selectPageId=11900"> Canada Infoway Snomed CT Releases Dashboard </a> </b></p>'
                 $releaseSwitcher.append(internationalDailyBuildButton + '<br>');
-                $releaseSwitcher.append('<h3>Published editions</h3>');
+                $releaseSwitcher.append('<h3 class="i18n" data-i18n-id="i18n_published_editions">Published editions</h3>');
                 $releaseSwitcher.append(snomedInternationalBrowserButton);
                 $releaseSwitcher.append(multiBrowserButton);
                 $releaseSwitcher.append('<br>');
@@ -2174,7 +2174,7 @@
             </large></h3> 
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-default i18n" data-dismiss="modal" data-i18n-id="i18n_close">Close</button>
         </div>
       </div>
     </div>
@@ -2202,7 +2202,7 @@
                     </button>
                 <a class="navbar-brand" href="javascript:void(0);" onclick="initialize();" id="navBarBrand" style="display: flex; align-items: center; justify-content: center;">
                     <img class="pull-left visible-lg" src="img/infoway-logo-en.png" style="width: 200px;"/>
-                    <strong class="i18n" data-i18n-id="i18n_title">
+                    <strong class="i18n" data-i18n-id="i18n_title" style="margin-left: 5px;">
                             &nbsp;&nbsp;SNOMED CT Browser</strong></a>
             </div>
             <!-- Collect the nav links, forms, and other content for toggling -->
@@ -2210,7 +2210,7 @@
                 <ul class="nav navbar-nav navbar-right">
                     <li class="navbar-btn" id="edition-selector" style="display: none">
                         <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
-                                <span class="i18n" data-i18n-id="i18n_release">Release</span>:&nbsp;<span id="editionLabel"></span> <span class="caret"></span>
+                                <span class="i18n" data-i18n-id="i18n_release">Release</span>: <span id="editionLabel"></span><span class="caret"></span>
                             </button>
                         <ul class="dropdown-menu" id="releaseSwitcher" role="menu">
                         </ul>
@@ -2354,7 +2354,7 @@
         <div id="welcome-perspective-dailybuild" class="bperspective">
             <div class="jumbotron">
                 <div><h4 style="display: inline;" id="lastUpdateTime" class="i18n"  data-i18n-id="i18n_last_update_time">Last updated: </h4> <h4 style="display: inline;" id="lastUpdateTimeFromSnowstorm"></h4></div>
-                <h1>Canada Health Infoway’s SNOMED CT® Canadian Edition Daily Build Browser</h1>
+                <h1 class="i18n" data+i18-id="i18m_canada_title">Canada Health Infoway’s SNOMED CT® Canadian Edition Daily Build Browser</h1>
                 <!-- <p>This is a browser for the SNOMED CT Daily Build.</p> -->
                 <h2><span class="text-warning" class="i18n" data-i18n-id="i18n_canada_home_notice">IMPORTANT NOTICE – PLEASE READ THE FOLLOWING CAREFULLY</span></h2>
                 <p class="i18n" data-i18n-id="i18n_canada_home1">Canada Health Infoway’s SNOMED CT® Canadian Edition Daily Build Browser (the “Browser”) is a development environment that provides ways to browse and search SNOMED CT Canadian Edition English and French content that has not been published.</p>
@@ -2594,7 +2594,10 @@ Please provide any feedback by clicking on the feedback button at the top of the
                             <li class="pull-left">
                                 <a href="javascript:void(0);" onclick="switchLanguage('en', 'img/flags/us.png', true);"><img src="img/flags/us.png" /> English</a>
                             </li>
-                            <li class="pull-left">
+                            <li>
+                                <a href="javascript:void(0);" onclick="switchLanguage('fr', 'img/flags/fr.png', true);"><img src="img/flags/fr.png" /> Français</a>
+                            </li>
+                            <!-- <li class="pull-left">
                                 <a href="javascript:void(0);" onclick="switchLanguage('es', 'img/flags/es.png', true);"><img src="img/flags/es.png" /> Español</a>
                             </li>
                             <li class="pull-left">
@@ -2605,7 +2608,7 @@ Please provide any feedback by clicking on the feedback button at the top of the
                             </li>
                             <li class="pull-left">
                                 <a href="javascript:void(0);" onclick="switchLanguage('se', 'img/flags/se.png', true);"><img src="img/flags/se.png" /> Svenska</a>
-                            </li>
+                            </li> -->
                         </ul>
                     </div>
                 </div>
