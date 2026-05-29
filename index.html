@@ -233,7 +233,7 @@
                         items: [],
                     };
                     result.items.forEach(function(release) {
-                        if (release.dailyBuildAvailable) {
+                        if (!release.dailyBuildAvailable || release.dailyBuildAvailable == "false") {
                             dailyBuilds.items.push(release);
                         }
                     });
