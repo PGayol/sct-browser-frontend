@@ -506,7 +506,8 @@
                         $span2.append(release.name + "<br>Community Content");
                         $("#editionLabel").html(release.name + " Community Content");
                     } else {
-                        $span2.append(release.name + "<br>" + release.latestVersion.version);
+                        // $span2.append(release.name + "<br>" + release.latestVersion.version);
+                        $span2.append(release.name);
                     }
 
                     var $a = $('<a>').attr("class", "btn btn-primary btn-lg").attr("role", "button").attr("style", "margin-bottom : 15px");
