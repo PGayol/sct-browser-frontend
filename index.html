@@ -198,7 +198,7 @@
             // } else if (window.location.hostname.includes('community')) {
             //     options.communityBrowser = true;
             // } else if (window.location.hostname.includes('concrete') || window.location.hostname.includes('preview')) {
-            //     options.previewBrowser = true;
+                options.previewBrowser = true;
             // } else if (window.location.hostname.includes('browser')) {
             //     options.publicBrowser = true;
             // } else {
@@ -233,15 +233,15 @@
                         items: [],
                     };
                     result.items.forEach(function(release) {
-                        if (!release.dailyBuildAvailable || release.dailyBuildAvailable == "false") {
+                        if (release.dailyBuildAvailable) {
                             dailyBuilds.items.push(release);
                         }
                     });
 
                     options.serverUrl = "/snowstorm/snomed-ct";
                     options.queryServerUrl = "/snowstorm/snomed-ct";
-                    options.releases = dailyBuilds;
-
+                    // options.releases = dailyBuilds;
+                    options.releases = result;
                     const internationalEditionShortNames = ['SNOMEDCT', 'SNOMEDCT-ES'];
                     // sort extensions. International and Spanish Editions are always on Top
                     if (options.releases) {
