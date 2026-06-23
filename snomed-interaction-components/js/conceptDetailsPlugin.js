@@ -919,9 +919,7 @@ function conceptDetails(divElement, conceptId, options) {
             // load descriptions panel
             panel.descsPId = divElement.id + "-descriptions-panel";
 
-            if (panel.options.languageRefsets && panel.options.languageRefsets.length !== 0) {
-                panel.renderDesriptionsPanel(firstMatch);
-            }
+            panel.renderDesriptionsPanel(firstMatch);
 
             // load descriptions panel
             panel.annotationsPId = divElement.id + "-annotations-panel";
