@@ -8,16 +8,52 @@
     <meta name="viewport" content="width=device-width">
     <meta name="description" content="SNOMED International SNOMED CT Browser">
     <meta name="author" content="SNOMED International">
+    <script src="js/http-interceptor.js"></script>
 
     <script src="internal-libs/snomed-interaction-components.min.js?version=build_version"></script>
-    <script type="text/javascript" src="ecl-builder/ecl-builder.js"></script>
+    <script type="text/javascript" src="internal-libs/node_modules/snomed-ecl-builder/output/ecl-builder.js"></script>
 
-    <link rel="stylesheet" type="text/css" href="ecl-builder/styles.css">
     <link rel="stylesheet" type="text/css" href="css/external.css">
+    <link rel="stylesheet" type="text/css" href="css/footer.css">
 
     <style>
         .modal.fade .modal-dialog {
             margin-top: 60px;
+        }
+
+        .row.splitter_panel {
+            height: calc(100vh - 95px) !important;
+        }
+
+        .ecl-builder ngb-typeahead-window.dropdown-menu {
+            max-width: 60vw !important;
+        }
+
+        .ecl-builder div.modal-body button.circle {
+            top: 20px !important;
+        }
+
+        .ecl-builder div.expression-group.grey div.expression-row:first-child div.position-relative,
+        .ecl-builder div.expression-group.grey div.expression-row:first-child input[type=text] {
+            width: 61.3vw !important;
+        }
+
+        .ecl-builder div.expression-group.grey div.expression-row:not(:first-child) div.position-relative,
+        .ecl-builder div.expression-group.grey div.expression-row:not(:first-child) input[type=text] {
+            width: 57vw !important;
+        }
+
+        .ecl-builder div.expression-group.blue div.expression-row:not(:first-child) div.position-relative,
+        .ecl-builder div.expression-group.blue div.expression-row:not(:first-child) input[type=text] {
+            width: 19.85vw !important;
+        }
+
+        .ecl-builder div.expression-group.grey div.expression-row:first-child ngb-typeahead-window.dropdown-menu {
+            left: 0px !important;
+        }
+
+        .ecl-builder div.expression-group.grey div.expression-row:not(:first-child) ngb-typeahead-window.dropdown-menu {
+            left: 0px !important;
         }
     </style>
 
@@ -45,6 +81,18 @@
             } else {
                 prefix = 'prd';
             }
+            return prefix;
+        }
+
+        function getEnvPrefix() {
+            const env = window.location.hostname.split(/[.]/)[0];
+            let prefix = '';
+            if (env.startsWith('dev-')) {
+                prefix = 'dev-';
+            } else if (env.startsWith('uat-')) {
+                prefix = 'uat-';
+            }
+
             return prefix;
         }
 
@@ -112,7 +160,6 @@
             highlightByEffectiveTime: "false",
             dailyBuildBrowser: true,
             publicBrowser: false,
-            previewBrowser: false,
             tsBrowser: false,
             communityBrowser: false,
             communityContentReleases: [],
@@ -122,37 +169,7 @@
             lastUpdateTimeFromSnowstorm: '',
         };
 
-        options.languageNameOfLangRefset = {
-            "20581000087109": "fr-CA",
-            "19491000087109": "en-CA",
-            "900000000000508004": "GB",
-            "900000000000509007": "US",
-            "450828004": "ES",
-            "5641000179103": "ES-UY",
-            "554461000005103": "DA",
-            "46011000052107": "SV",
-            "32570271000036106": "AU",
-            "11000146104": "NL",
-            "31000146106": "NL",
-            "31000172101": "NL",
-            "15551000146102": "NL-PF",
-            "61000202103": "NO-NB",
-            "91000202106": "NO-NN",
-            "21000172104": "FR",
-            "21000220103": "IE",
-            "71000181105": "ET",
-            "281000210109": "NZ-PF",
-            "271000210107": "NZ",
-            "722128001": "ZH",
-            "291000210106": "MI",
-            "21000241105": "FR",
-            "722130004": "DE",
-            "2041000195100": "DE",
-            "2021000195106": "FR",
-            "2031000195108": "IT"
-        };
-
-        options.updateReleaseSwitcher = function(branch, conceptId) {
+        options.updateReleaseSwitcher = function (branch, conceptId) {
             options.edition = branch;
             defaultConceptId = conceptId;
 
@@ -165,7 +182,7 @@
             }
         };
 
-        options.setEcl = function(eclQuery) {
+        options.setEcl = function (eclQuery) {
             options.ecl = eclQuery;
         };
 
@@ -173,7 +190,7 @@
             $.ajax({
                 type: 'GET',
                 url: '/',
-                success: function(data, textStatus, response) {
+                success: function (data, textStatus, response) {
                     let copyrightYear = new Date(response.getResponseHeader('Date')).getFullYear();
                     $('.copyright_year').text(copyrightYear);
                 }
@@ -182,7 +199,7 @@
 
         function setUILanguage() {
             var ui_language = '';
-            if (typeof(Storage) !== "undefined") {
+            if (typeof (Storage) !== "undefined") {
                 if (localStorage.getItem("ui_language")) {
                     ui_language = localStorage.getItem("ui_language");
                 }
@@ -225,7 +242,7 @@
                 });
             }
 
-            var getCodeSystems = function() {
+            var getCodeSystems = function () {
                 var dfd = $.Deferred();
 
                 $.getJSON("/snowstorm/snomed-ct/codesystems", function(result) {}).done(function(result) {
@@ -242,26 +259,7 @@
                     options.queryServerUrl = "/snowstorm/snomed-ct";
                     options.releases = dailyBuilds;
 
-                    const internationalEditionShortNames = ['SNOMEDCT', 'SNOMEDCT-ES'];
-                    // sort extensions. International and Spanish Editions are always on Top
-                    if (options.releases) {
-                        options.releases.items.sort(function(a, b) {
-                            if (a.shortName === 'SNOMEDCT' && b.shortName === 'SNOMEDCT-ES') {
-                                return -1;
-                            }
-                            if (b.shortName === 'SNOMEDCT' && a.shortName === 'SNOMEDCT-ES') {
-                                return 1;
-                            }
-                            if (internationalEditionShortNames.indexOf(a.shortName) > -1) {
-                                return -1;
-                            }
-                            if (internationalEditionShortNames.indexOf(b.shortName) > -1) {
-                                return 1;
-                            }
-
-                            return a.name.localeCompare(b.name);
-                        });
-                    }
+                    const internationalEditionShortNames = ['SNOMEDCT', 'SNOMEDCT-ES', 'SNOMEDCT-DERIVATIVES'];
 
                     // dynamic extension links
                     var internationalReleases = [];
@@ -274,11 +272,6 @@
                     if (options.releases) {
                         for (let i = 0; i < options.releases.items.length; ++i) {
                             var release = options.releases.items[i];
-
-                            /* TODO: The default Accept language should be handled by code-system */
-                            if (release.shortName === 'SNOMEDCT-NZ') {
-                                release.defaultAcceptLanguage = 'en-X-271000210107';
-                            }
                             if (internationalEditionShortNames.indexOf(release.shortName) > -1) {
                                 if (release.shortName === 'SNOMEDCT') {
                                     release.stats = true;
@@ -307,19 +300,21 @@
                         }
                     }
 
+                    // sort international extensions
+                    internationalReleases.sort(function (a, b) {
+                        return internationalEditionShortNames.indexOf(a.shortName) - internationalEditionShortNames.indexOf(b.shortName);
+                    });
+
                     // sort local extensions again
-                    localReleases.sort(function(a, b) {
+                    localReleases.sort(function (a, b) {
                         return a.name.localeCompare(b.name);
                     });
 
                     if (options.publicBrowser) {
                         addEditionLinks($('#international_editions'), internationalReleases);
                         addEditionLinks($('#local_editions'), localReleases);
-                        addStatsLinks($('#international_stats'), internationalReleases);
-                        addMrcmLink($('#international_mrcm'), internationalReleases);
-                    } else if (options.previewBrowser) {
-                        addEditionLinks($('#preview_editions'), internationalReleases);
-                        addMrcmLink($('#preview_mrcm'), internationalReleases);
+                        addStatsLinks($('#international_tools'), internationalReleases);
+                        addMrcmLink($('#international_tools'), internationalReleases);
                     } else if (options.communityBrowser) {
                         addEditionLinks($('#commnunity_content_editions'), options.communityContentReleases)
                     } else if (options.dailyBuildBrowser) {
@@ -334,26 +329,77 @@
                         internationalReleases: internationalReleases,
                         localReleases: localReleases
                     });
-                }).fail(function() {
+                }).fail(function () {
                     console.log('fail');
-                    options.serverUrl = "/snowowl/snomed-ct/v2";
-                    options.queryServerUrl = "/snowowl/snomed-ct/v2";
-
                     dfd.resolve();
                 });
 
                 return dfd.promise();
             };
 
-            var getUIConfiguration = function() {
+            var getConfig = function () {
                 var dfd = $.Deferred();
 
-                if (options.dailyBuildBrowser || options.publicBrowser || options.communityBrowser || options.previewBrowser) {
+                $.ajax({
+                    url: 'config.json',
+                    async: false,
+                    cache: false,
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    success: function (data, status) {
+                        countryIcons = data.countryIcons;
+                        options.languageNameOfLangRefset = data.languageRefsetShortname;
+                        options.singleCharacterSearchLanguageRefsets = data.singleCharacterSearchLanguageRefsets;
+                        options.showIssueCollector = data.showIssueCollector;
+                        options.thirdPartyTrackingEnabled = data.thirdPartyTrackingEnabled;
+                        options.countryLinks = data.countryLinks;
+                        options.countryLinksOrder = data.countryLinksOrder;
+                        options.defaultAcceptLanguageMapping = data.defaultAcceptLanguage;
+                        
+                        // Render country links if they exist in config
+                        if (data.countryLinks && data.countryLinksOrder) {
+                            renderCountryLinks(data.countryLinks, data.countryLinksOrder);
+                        }
+                        
+                        dfd.resolve();
+                    }
+                });
+
+                return dfd.promise();
+            }
+
+            var renderCountryLinks = function(countryLinks, order) {
+                var $container = $('#country-links-container');
+                $container.empty();
+                
+                // Use the provided order array to maintain the original order
+                $.each(order, function(index, countryCode) {
+                    var country = countryLinks[countryCode];
+                    if (!country) return; // Skip if country doesn't exist
+                    
+                    var flagSize = countryCode === 'ar' ? '16px' : '11px';
+                    var heightStyle = countryCode === 'ar' ? 'width:16px;height:16px' : 'width:16px;height:11px';
+                    
+                    var $flagSpan = $('<span>').attr('class', 'phoca-flagbox').attr('style', heightStyle);
+                    $flagSpan.append($('<span>').attr('class', 'phoca-flag ' + countryCode).attr('style', 'width:100%;height:100%'));
+                    
+                    var $link = $('<a>').attr('href', country.url).attr('target', '_blank').text(country.label);
+                    
+                    var $line = $('<div>').append($flagSpan).append('&nbsp;&nbsp;&nbsp;').append($link);
+                        
+                    $container.append($line);
+                });
+            }
+
+            var getUIConfiguration = function () {
+                var dfd = $.Deferred();
+
+                if (options.dailyBuildBrowser || options.publicBrowser || options.communityBrowser) {
                     options.imsUrl = null;
                     return dfd.resolve();
                 }
 
-                $.getJSON("/authoring-services/ui-configuration", function(result) {}).done(function(result) {
+                $.getJSON("/authoring-services/ui-configuration", function (result) { }).done(function (result) {
                     options.imsUrl = result.endpoints.imsEndpoint;
                     options.tsBrowser = true;
 
@@ -388,7 +434,7 @@
                     $header.append($taskSelect);
 
                     dfd.resolve();
-                }).fail(function() {
+                }).fail(function () {
                     options.imsUrl = null;
                     dfd.resolve();
                 })
@@ -396,17 +442,17 @@
                 return dfd.promise();
             };
 
-            $.when(getCodeSystems(), getUIConfiguration()).then(function(response) {
+            $.when(getCodeSystems(), getUIConfiguration(), getConfig()).then(function (response) {
                 if (options.imsUrl == null) {
 
                     // Marked as public browser if both daily build and community browser could not be specifed from URL
-                    if (!options.communityBrowser && !options.dailyBuildBrowser && !options.publicBrowser && !options.previewBrowser) {
+                    if (!options.communityBrowser && !options.dailyBuildBrowser && !options.publicBrowser) {
                         options.publicBrowser = true;
                         if (response && response.internationalReleases && response.localReleases) {
                             addEditionLinks($('#international_editions'), response.internationalReleases);
                             addEditionLinks($('#local_editions'), response.localReleases);
-                            addStatsLinks($('#international_stats'), response.internationalReleases);
-                            addMrcmLink($('#international_mrcm'), response.internationalReleases);
+                            addStatsLinks($('#international_tools'), response.internationalReleases);
+                            addMrcmLink($('#international_tools'), response.internationalReleases);
                         }
                     }
                     $('#edition-selector').css('display', 'block');
@@ -417,7 +463,7 @@
                                 let release = options.releases.items[i];
                                 if (typeof release.latestVersion !== 'undefined' && release.countryCode) {
                                     count++;
-                                    $('#extension-flags').append($('<img>').attr("src", "img/flags/" + release.countryCode + ".png")).append(' ');
+                                    $('#extension-flags').append('<div class="phoca-flagbox" style="width:16px;height:11px"><span class="phoca-flag ' + release.countryCode + '" style="width:100%;height:100%"></span></div>').append(' ');
                                     if (count !== 0 && (count % 7 === 0)) {
                                         $('#extension-flags').append('<br>');
                                     }
@@ -427,14 +473,81 @@
                         $('#multi-extension-search').css('display', 'block');
                         $('#version-selector').css('display', 'block');
                     }
+
+                    if (options.thirdPartyTrackingEnabled && options.publicBrowser) {
+                        initWidgetFeedback();
+                        initGoogleTag();
+                        initBrowserUpdate();
+                    }
                 } else {
-                    if (options.serverUrl === '/snowowl/snomed-ct/v2') {
-                        $('#fh-refset_canvas').css('display', 'none');
-                        $('#fh-refset_canvas-li').css('display', 'none');
+                    // do nothing
+                }
+
+                // Set default accept language from config
+                if (options.releases && options.defaultAcceptLanguageMapping) {
+                    for (let i = 0; i < options.releases.items.length; ++i) {
+                        var release = options.releases.items[i];
+                        if (options.defaultAcceptLanguageMapping[release.shortName]) {
+                            release.defaultAcceptLanguage = options.defaultAcceptLanguageMapping[release.shortName];
+                        }
                     }
                 }
+                
                 start();
             });
+        }
+
+        function initWidgetFeedback() {
+            var e = document.createElement('script');
+            e.type = 'text/javascript';
+            e.async = true;
+            e.src = 'https://s3.amazonaws.com/assets.freshdesk.com/widget/freshwidget.js';
+            e.onload = function () {
+                if (typeof FreshWidget !== "undefined" && typeof FreshWidget.init === "function") {
+                    document.getElementById("feedback-button").style.display = "block";
+
+                    FreshWidget.init("", {
+                        "queryString": "&widgetType=popup&formTitle=SNOMED+CT+Browser+Feedback&submitTitle=Send+Feedback&submitThanks=Thank+you+for+your+feedback&captcha=yes&searchArea=no",
+                        "utf8": "✓",
+                        "backgroundImage": "https://s3.amazonaws.com/assets.freshdesk.com/widget/help-button.png",
+                        "widgetType": "popup",
+                        "buttonType": "image",
+                        "buttonText": "Support",
+                        "buttonColor": "white",
+                        "buttonBg": "#00aadd",
+                        "alignment": "1",
+                        "offset": "-1500px",
+                        "submitThanks": "Thank you for your feedback",
+                        "formHeight": "500px",
+                        "captcha": "yes",
+                        "url": "https://ihtsdo.freshdesk.com",
+                        "loadOnEvent": "immediate"
+                    });
+                }
+            };
+
+            document.body.appendChild(e);
+        }
+
+        function initGoogleTag() {
+            var script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = 'https://www.googletagmanager.com/gtag/js?id=G-MFCMKEHSYB';
+            script.onload = function () {
+                window.dataLayer = window.dataLayer || [];
+                function gtag() { dataLayer.push(arguments); }
+                gtag('js', new Date());
+
+                gtag('config', 'G-MFCMKEHSYB');
+            };
+            document.body.appendChild(script);
+        }
+
+        function initBrowserUpdate() {
+            var e = document.createElement("script");
+            e.setAttribute("type", "text/javascript");
+            e.setAttribute("src", "//browser-update.org/update.js");
+            document.body.appendChild(e);
         }
 
         function addStatsLinks($statsLinks, releases) {
@@ -444,8 +557,9 @@
                     var $span1 = $('<span>');
                     var $span2 = $('<span>');
                     $span1.text("Release Stats");
-                    $span2.attr("class", "glyphicon glyphicon-signal").attr("style", "margin-left : 5px;");;
-                    var $a = $('<a>').attr("class", "btn btn-primary").attr("role", "button").attr("style", "margin-top : -8px; width:165px; margin-bottom:10px;");
+                    $span1.attr("style", "margin-left:15px;");
+                    $span2.attr("class", "glyphicon glyphicon-signal").attr("style", "top: 30px; left: -50px; font-size: 18px;");
+                    var $a = $('<a>').attr("class", "btn btn-primary btn-lg").attr("role", "button").attr("style", "height:81px; width:165px; margin-bottom:10px;");
                     $a.append($span1);
                     $a.append($span2);
                     $a.attr("href", '/qa');
@@ -463,11 +577,9 @@
                     var $span1 = $('<span>');
                     var $span2 = $('<span>');
                     $span1.text("MRCM Browser");
-                    if (options.previewBrowser) {
-                        var $a = $('<a>').attr("class", "btn btn-primary").attr("role", "button").attr("style", "margin-top : -6px; width:253px; margin-bottom:10px;");
-                    } else {
-                        var $a = $('<a>').attr("class", "btn btn-primary").attr("role", "button").attr("style", "margin-top : -6px; width:165px; margin-bottom:10px;");
-                    }
+                    $span1.attr("style", "margin-left:15px;");
+                    var $a = $('<a>').attr("class", "btn btn-primary btn-lg").attr("role", "button").attr("style", "height:81px; width:165px; margin-bottom:10px;");
+                    $span2.attr("class", "glyphicon glyphicon-tasks").attr("style", "top: 30px; left: -70px; font-size: 18px;");
                     $a.append($span1);
                     $a.append($span2);
                     $a.attr("href", '/mrcm');
@@ -483,7 +595,7 @@
             for (let i = 0; i < releases.length; ++i) {
                 let release = releases[i];
                 if (typeof release.latestVersion !== 'undefined' || options.dailyBuildBrowser || options.communityBrowser) {
-                    var $img = $('<img>').attr("src", release.countryCode !== '' ? "img/flags/" + release.countryCode + ".png" : "img/logo.png").attr("style", release.countryCode !== '' ? "" : "height:20px");
+                    var $img = '<div class="phoca-flagbox" style="' + (release.countryCode !== '' ? 'width:16px;height:11px' : 'width:20px;height:20px') + '"><span class="phoca-flag ' + (release.countryCode !== '' ? release.countryCode : 'logo') + '" style="width:100%;height:100%"></span></div>' + ' ';
 
                     var $span1 = $('<span>').attr("class", "i18n").attr("data-i18n-id", "i18n_go_browsing");
                     $span1.text("Go browsing...");
@@ -522,7 +634,9 @@
                         $a.attr("target", "_blank");
                     } else {
                         $a.attr("href", "javascript:void(0);");
-                        $a.on("click", function() {
+                        $a.attr("editionCode", release.countryCode);
+                        $a.attr("codesystem-shortname", release.shortName);
+                        $a.on("click", function () {
                             var parsedLanguages = "";
                             for (var language in release.languages) {
                                 parsedLanguages = parsedLanguages + language + ',';
@@ -550,7 +664,7 @@
                                 if (options.publicBrowser) {
                                     $("#editionLabel").html(release.name);
                                     $("#versionLabel").html(release.latestVersion.version);
-                                    initVersionsDropdown(release);
+                                    initVersionsDropdown(release.shortName);
                                 } else {
                                     $("#editionLabel").html(release.name + " " + release.latestVersion.version);
                                 }
@@ -600,25 +714,32 @@
             var flag = '';
             if (ui_language == "en") {
                 language = 'en';
-                flag = 'img/flags/us.png';
+                flag = 'us';
             } else if (ui_language == "es") {
                 language = 'es';
-                flag = 'img/flags/es.png';
+                flag = 'es';
             } else if (ui_language == "sv") {
                 language = 'sv';
-                flag = 'img/flags/se.png';
+                flag = 'se';
             } else if (ui_language == "da") {
                 language = 'da';
-                flag = 'img/flags/dk.png';
+                flag = 'dk';
             } else if (ui_language == "fr") {
                 language = 'fr';
-                flag = 'img/flags/fr.png';
+                flag = 'fr';
             } else if (ui_language == "pt") {
                 language = 'pt';
-                flag = 'img/flags/pt.png';
-            } else {
+                flag = 'pt';
+            } else if (ui_language == "no") {
+                language = 'no';
+                flag = 'no';
+            } else if (ui_language == "de") {
+                language = 'de';
+                flag = 'de';
+            }
+            else {
                 language = 'en';
-                flag = 'img/flags/us.png';
+                flag = 'us';
             }
 
             return {
@@ -656,21 +777,34 @@
             }
             // Read parameters
             $.ajaxSetup({
-                "error": function(jqXHR, textStatus, errorThrown) {
+                "error": function (jqXHR, textStatus, errorThrown) {
                     if (options.imsUrl && jqXHR.status == 403) {
                         window.location = decodeURIComponent(options.imsUrl + 'login' + '?serviceReferer=' + window.location.href);
                     }
                 }
             });
-            $(function() {
-                $.extend($.fn.disableTextSelect = function() {
-                    return this.each(function() {
-                        $(this).mousedown(function() {
+            $(function () {
+                $.extend($.fn.disableTextSelect = function () {
+                    return this.each(function () {
+                        $(this).mousedown(function () {
                             return false;
                         });
                     });
                 });
                 $('.noSelect').disableTextSelect(); //No text selection on elements with a class of 'noSelect'
+            });
+
+            // hide any open popovers when the anywhere else in the body is clicked
+            $('body').on('mouseup', function (e) {
+                $("div[class$='-popover'],div[class*='-popover ']").each(function () {
+                    if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0 && $(this).hasClass("in")) {
+                        $.each($(this).attr('class').split(/\s+/), function (i, name) {
+                            if (name.indexOf('-popover') > -1) {
+                                $('#' + name.substr(0, name.indexOf('-popover'))).popover('hide');
+                            }
+                        });
+                    }
+                });
             });
 
             var diagrammingMarkupEnabled = QueryString.diagrammingMarkupEnabled;
@@ -709,7 +843,6 @@
         }
 
         function initializePublicBrowser() {
-
             setUILanguage();
             var edition = QueryString.edition;
             var isLatestRedirect = true;
@@ -719,10 +852,10 @@
             }
             if (options.dailyBuildBrowser || options.communityBrowser) {
                 var releases = options.dailyBuildBrowser ? options.dailyBuildReleases : options.communityContentReleases;
-                if (releases.filter(function(release) {
-                        hideCommunityContentTab(release);
-                        return release.branchPath === edition;
-                    }).length !== 0) {
+                if (releases.filter(function (release) {
+                    hideCommunityContentTab(release);
+                    return release.branchPath === edition;
+                }).length !== 0) {
                     options.edition = edition;
                 } else {
                     options.edition = 'MAIN';
@@ -758,10 +891,11 @@
                         console.error('Edition not found');
                     }
                 } else {
-                    if (options.releases.items.filter(function(release) {
-                            return (typeof release.latestVersion !== "undefined") && release.latestVersion.branchPath === edition;
-                        }).length !== 0) {
-                        options.edition = edition;
+                    var filteredReleases = options.releases.items.filter(function (release) {
+                        return (typeof release.latestVersion !== "undefined") && (release.branchPath === edition || release.latestVersion.branchPath === edition);
+                    });
+                    if (filteredReleases.length !== 0) {
+                        options.edition = filteredReleases[0].latestVersion.branchPath;
                     } else {
                         for (let i = 0; i < options.releases.items.length; i++) {
                             let release = options.releases.items[i];
@@ -772,6 +906,7 @@
                         }
                     }
                 }
+                QueryString = queryString();
                 if (options.releases && options.releases.items && options.releases.items.length > 0) {
                     for (let i = options.releases.items.length - 1; i >= 0; i--) {
                         let release = options.releases.items[i];
@@ -788,6 +923,9 @@
                             }
                             parsedLanguages = parsedLanguages.slice(0, -1);
                             options.defaultLanguage = getDefaultLanguage(release.defaultLanguageCode, parsedLanguages);
+                            if (!QueryString || !QueryString.languages) {
+                                options.languages = parsedLanguages;
+                            }
                             break;
                         }
                     }
@@ -813,7 +951,7 @@
             if (typeof txValue2 == "undefined" || txValue2 == null || txValue2 == "") {
                 txValue2 = 138875005;
             }
-
+            console.log(options);
             if (QueryString.perspective == "home") {
                 initialize();
             } else if (QueryString.perspective == "browsing") {
@@ -839,8 +977,13 @@
                 acceptLicense = false;
             }
 
+            $("#navBarBrand").unbind();
+            $("#navBarBrand").on("click", function () {
+                initialize();
+            });
+
             $("#accept-license-button-modal").unbind();
-            $("#accept-license-button-modal").click(function() {
+            $("#accept-license-button-modal").click(function () {
                 createCookie("licenseCookie", "true", 2);
             });
             options.acceptLicense = (acceptLicense == "true" || getCookie("licenseCookie") == "true");
@@ -849,7 +992,7 @@
             }
 
             $("#cookiescript_accept").unbind();
-            $("#cookiescript_accept").click(function() {
+            $("#cookiescript_accept").click(function () {
                 createCookie("complianceCookie", "true", 2);
                 $('#cookiescript').hide();
             });
@@ -864,6 +1007,7 @@
             // set language one more time after finishing components initialization
             setUILanguage();
 
+
             // RELEASES DROPDOWN HANDLER for daily build/community content
             if (options.dailyBuildBrowser || options.communityBrowser) {
                 if ((options.dailyBuildBrowser && options.dailyBuildReleases) ||
@@ -877,7 +1021,7 @@
                         var daily_build_text = ui_lang == "fr" ? 'Version Quotidienne' : 'Daily Build'
                         var $a = $('<a>').attr("shortName", release.shortName).append(release.name + " ").append('<span style="color: dodgerblue;">' + (options.dailyBuildBrowser ? '<p style="display: inline;" class="i18n" data-i18n-id="i18n_daily_build"> ' + daily_build_text + ' </p>' : 'Community Content') + '</span>');
                         $a.attr("href", "javascript:void(0);");
-                        $a.on("click", function() {
+                        $a.on("click", function () {
                             var parsedLanguages = "";
                             if (options.communityBrowser) {
                                 if (typeof release.latestVersion !== 'undefined') {
@@ -907,6 +1051,10 @@
                             options.defaultLanguage = getDefaultLanguage(release.defaultLanguageCode, parsedLanguages);
                             options.defaultAcceptLanguage = release.defaultAcceptLanguage ? release.defaultAcceptLanguage : '';
 
+                            if (currentPerspective == "home") {
+                                currentPerspective = "full";
+                            }
+
                             reloadCurrentPerspective();
 
                             var selectedLanguageAndFlag = getSelectedLanguageAndFlag(options.defaultLanguage);
@@ -928,13 +1076,14 @@
             else {
                 if (options.releases && options.releases.items) {
                     var $releaseSwitcher = $('#releaseSwitcher');
+                    var foundRelease = null;
                     for (let i = 0; i < options.releases.items.length; ++i) {
                         let release = options.releases.items[i];
-                        if (typeof release.latestVersion !== "undefined") {
+                        if (typeof release.latestVersion !== "undefined" && (!release.maintainerType || release.maintainerType !== 'Community Content')) {
                             var $li = $('<li>')
                             var $a = $('<a>').attr("shortName", release.shortName).append(release.name);
                             $a.attr("href", "javascript:void(0);");
-                            $a.on("click", function(event) {
+                            $a.on("click", function (event) {
                                 event.stopPropagation();
 
                                 var parsedLanguages = "";
@@ -955,19 +1104,23 @@
                                 var selectedLanguageAndFlag = getSelectedLanguageAndFlag(options.defaultLanguage);
                                 QueryString = queryString();
 
+                                if (currentPerspective == "home") {
+                                    currentPerspective = "full";
+                                }
+
                                 if (QueryString.conceptId1) {
-                                    var checkConceptExist = function(conceptId) {
+                                    var checkConceptExist = function (conceptId) {
                                         var dfd = $.Deferred();
-                                        xhr = $.getJSON(options.serverUrl + "/" + options.edition + "/concepts/" + QueryString.conceptId1, function(result) {
+                                        xhr = $.getJSON(options.serverUrl + "/" + options.edition + "/concepts/" + QueryString.conceptId1, function (result) {
                                             dfd.resolve(true);
-                                        }).done(function(result) {}).fail(function() {
+                                        }).done(function (result) { }).fail(function () {
                                             dfd.resolve(false);
                                         });
 
                                         return dfd.promise();
                                     };
 
-                                    checkConceptExist(QueryString.conceptId1).then(function(result) {
+                                    checkConceptExist(QueryString.conceptId1).then(function (result) {
                                         if (result) {
                                             reloadCurrentPerspective();
                                         } else {
@@ -977,7 +1130,7 @@
                                         if (options.publicBrowser) {
                                             $("#editionLabel").html(release.name);
                                             $("#versionLabel").html(release.latestVersion.version);
-                                            initVersionsDropdown(release);
+                                            initVersionsDropdown(release.shortName);
                                         } else {
                                             $("#editionLabel").html(release.name + " " + release.latestVersion.version);
                                         }
@@ -988,7 +1141,7 @@
                                     if (options.publicBrowser) {
                                         $("#editionLabel").html(release.name);
                                         $("#versionLabel").html(release.latestVersion.version);
-                                        initVersionsDropdown(release);
+                                        initVersionsDropdown(release.shortName);
                                     } else {
                                         $("#editionLabel").html(release.name + " " + release.latestVersion.version);
                                     }
@@ -997,14 +1150,30 @@
                             $li.append($a);
                             $releaseSwitcher.append($li);
 
-                            // set default selection for release
                             if (options.edition && release.latestVersion.branchPath === options.edition) {
-                                if (options.publicBrowser) {
+                                foundRelease = release;
+                            }
+                        }
+                    }
+                    // set default selection for release
+                    if (foundRelease) {
+                        if (options.publicBrowser) {
+                            $("#editionLabel").html(foundRelease.name);
+                            $("#versionLabel").html(foundRelease.latestVersion.version);
+                            initVersionsDropdown(foundRelease.shortName);
+                        } else {
+                            $("#editionLabel").html(foundRelease.name + " " + foundRelease.latestVersion.version);
+                        }
+                    } else {
+                        if (options.publicBrowser && /^MAIN.*\d{4}-\d{2}-\d{2}$/.test(options.edition)) {
+                            var isInternationalBranch = /^MAIN\/+\d{4}-\d{2}-\d{2}$/.test(options.edition);
+                            for (let i = 0; i < options.releases.items.length; ++i) {
+                                let release = options.releases.items[i];
+                                if ((isInternationalBranch && release.branchPath === 'MAIN') || (!isInternationalBranch && release.branchPath !== 'MAIN' && options.edition.startsWith(release.branchPath))) {
                                     $("#editionLabel").html(release.name);
-                                    $("#versionLabel").html(release.latestVersion.version);
-                                    initVersionsDropdown(release);
-                                } else {
-                                    $("#editionLabel").html(release.name + " " + release.latestVersion.version);
+                                    $("#versionLabel").html(options.edition.substring(options.edition.lastIndexOf('/') + 1));
+                                    initVersionsDropdown(release.shortName);
+                                    break;
                                 }
                             }
                         }
@@ -1013,12 +1182,12 @@
             }
         }
 
-        function initVersionsDropdown(release) {
-            $.getJSON("/snowstorm/snomed-ct/codesystems/" + release.shortName + "/versions?showFutureVersions=false&showInternalReleases=false", function(result) {}).done(function(result) {
+        function initVersionsDropdown(shortName) {
+            $.getJSON("/snowstorm/snomed-ct/codesystems/" + shortName + "/versions?showFutureVersions=false&showInternalReleases=false", function (result) { }).done(function (result) {
                 var $versionSwitcher = $('#versionSwitcher');
                 $versionSwitcher.html("");
                 if (result.items.length > 0) {
-                    result.items.sort(function(a, b) {
+                    result.items.sort(function (a, b) {
                         return b.effectiveDate - a.effectiveDate;
                     });
                 }
@@ -1027,7 +1196,10 @@
                     var $li = $('<li>');
                     var $a = $('<a>').append(version.version);
                     $a.attr("href", "javascript:void(0);");
-                    $a.on("click", function() {
+                    $a.on("click", function () {
+                        if (currentPerspective == "home") {
+                            currentPerspective = "full";
+                        }
                         options.edition = version.branchPath;
                         $("#versionLabel").html(version.version);
                         reloadCurrentPerspective();
@@ -1045,7 +1217,7 @@
         function initializeTSBrowser() {
             var selectedLanguageAndFlag = getSelectedLanguageAndFlag(options.defaultLanguage);
             switchLanguage(selectedLanguageAndFlag.selectedLanguage, selectedLanguageAndFlag.selectedFlag, false);
-            var isTask = function(task) {
+            var isTask = function (task) {
                 var strArray = task.split('-');
                 if (strArray.length === 2 && !isNaN(strArray[1])) {
                     return true;
@@ -1059,7 +1231,12 @@
                 options.release = release;
             }
 
-            $.when(getAuth(), getProjects()).then(function(roles, projects) {
+            $("#navBarBrand").unbind();
+            $("#navBarBrand").on("click", function () {
+                window.open("https://" + getEnvPrefix() + "browser.ihtsdotools.org/", "_blank");
+            });
+
+            $.when(getAuth(), getProjects()).then(function (roles, projects) {
 
                 if (options.managedServiceUser) {
                     findProjectMainline(projects);
@@ -1069,7 +1246,7 @@
                     }
                 }
 
-                var found = projects.filter(function(item) {
+                var found = projects.filter(function (item) {
                     return item.branchPath === options.edition;
                 }).length !== 0;
 
@@ -1095,15 +1272,15 @@
                         $('<option>').val(options.projectMainlinePath).text(options.projectMainlineText).appendTo($projectDdl);
                     }
                 }
-                $.each(projects, function() {
+                $.each(projects, function () {
                     $('<option>').val(this.branchPath).text(this.key).appendTo($projectDdl);
                 });
 
                 $("#projectDdl").val(options.edition);
 
-                getTasks().then(function(tasks) {
+                getTasks().then(function (tasks) {
                     if (options.release) {
-                        var found = tasks.filter(function(item) {
+                        var found = tasks.filter(function (item) {
                             return item.key === options.release;
                         }).length !== 0;
 
@@ -1123,7 +1300,7 @@
             function getAuth() {
                 var dfd = $.Deferred();
 
-                $.getJSON("/auth", function() {}).done(function(response) {
+                $.getJSON("/auth", function () { }).done(function (response) {
                     options.managedServiceUser = response.roles.includes('ROLE_ms-users') && !response.roles.includes('ROLE_int-sca-author');
                     dfd.resolve(response.roles);
                 });
@@ -1133,10 +1310,10 @@
 
             function getProjects() {
                 var dfd = $.Deferred();
-                $.getJSON("/authoring-services/projects?lightweight=true").done(function(result) {
+                $.getJSON("/authoring-services/projects?lightweight=true").done(function (result) {
                     var projectsInDateFormat = [];
                     var projectsInStringFormat = [];
-                    result.forEach(function(item) {
+                    result.forEach(function (item) {
                         var strArray = item.key.split('-');
                         if (!isNaN(strArray[0])) {
                             projectsInDateFormat.push(item);
@@ -1145,16 +1322,16 @@
                         }
                     });
 
-                    projectsInStringFormat.sort(function(a, b) {
+                    projectsInStringFormat.sort(function (a, b) {
                         return a.key.localeCompare(b.key);
                     });
 
-                    projectsInDateFormat.sort(function(a, b) {
+                    projectsInDateFormat.sort(function (a, b) {
                         return b.key.localeCompare(a.key);
                     });
                     result.items = projectsInStringFormat.concat(projectsInDateFormat);
 
-                    var projectChanged = function() {
+                    var projectChanged = function () {
                         options.edition = $('#projectDdl').val();
                         options.release = "None";
                         findDefaultLanguageRefsetsByBranchPath(options.edition);
@@ -1164,7 +1341,7 @@
                         switchLanguage(selectedLanguageAndFlag.selectedLanguage, selectedLanguageAndFlag.selectedFlag, false);
                     }
 
-                    $("#projectDdl").on("change", function(event) {
+                    $("#projectDdl").on("change", function (event) {
                         projectChanged(this, event);
                     });
 
@@ -1178,7 +1355,7 @@
             function getTasks() {
                 var dfd = $.Deferred();
 
-                var groupTaskList = function(taskList) {
+                var groupTaskList = function (taskList) {
                     //return b.baseTimestamp - a.baseTimestamp;
                     var map = {};
                     for (var i = 0; i < taskList.length; i++) {
@@ -1190,7 +1367,7 @@
                                 items = map[strArray[0]];
                             }
                             items.push(task);
-                            items.sort(function(a, b) {
+                            items.sort(function (a, b) {
                                 var strArrayA = a.key.split('-');
                                 var strArrayB = b.key.split('-');
                                 if (strArrayA[0] > strArrayB[0]) {
@@ -1211,7 +1388,7 @@
                     }
 
                     var keys = Object.keys(map);
-                    keys.sort(function(a, b) {
+                    keys.sort(function (a, b) {
                         return a.localeCompare(b);
                     });
 
@@ -1231,23 +1408,23 @@
 
                     return dfd.resolve([]);
                 }
-                $.getJSON("/authoring-services/projects/" + project + "/tasks?lightweight=true").done(function(result) {
+                $.getJSON("/authoring-services/projects/" + project + "/tasks?lightweight=true").done(function (result) {
                     var $taskDdl = $('#taskDdl');
                     $taskDdl.html("");
                     $('<option>').val("None").text("None").appendTo($taskDdl);
                     result = groupTaskList(result);
-                    $.each(result, function() {
+                    $.each(result, function () {
                         $('<option>').val(this.key).text(this.key).appendTo($taskDdl);
                     });
 
-                    var taskChanged = function() {
+                    var taskChanged = function () {
                         options.release = $('#taskDdl').val();
                         reloadCurrentPerspective(null, false);
                         var selectedLanguageAndFlag = getSelectedLanguageAndFlag(selectedLanguage);
                         switchLanguage(selectedLanguageAndFlag.selectedLanguage, selectedLanguageAndFlag.selectedFlag, false);
                     }
 
-                    $("#taskDdl").on("change", function(event) {
+                    $("#taskDdl").on("change", function (event) {
                         taskChanged(this, event);
                     });
 
@@ -1270,6 +1447,7 @@
                                 if (branchPath.includes(release.branchPath)) {
                                     options.languageObject = release.languages;
                                     options.defaultLanguageReferenceSets = release.defaultLanguageReferenceSets ? release.defaultLanguageReferenceSets : [];
+                                    options.defaultAcceptLanguage = release.defaultAcceptLanguage ? release.defaultAcceptLanguage : '';
                                     options.modules = release.modules;
 
                                     var parsedLanguages = "";
@@ -1317,140 +1495,140 @@
             if (typeof tours[selectedLanguage] == "undefined") {
                 tours[selectedLanguage] = new Tour({
                     steps: [{
-                            element: "nothing",
-                            title: i18n_tour_step1_fh_title,
-                            content: i18n_tour_step1_fh_text,
-                            placement: "bottom",
-                            orphan: true,
-                            backdrop: false,
-                            onShow: function(tour) {
-                                switchToFullHeight(204351007, 138875005)
-                            }
-                        }, {
-                            element: "#fh-tabs-pane",
-                            title: i18n_tour_step2_title,
-                            content: i18n_tour_step2_text,
-                            placement: "right",
-                            backdrop: true
-                        }, {
-                            element: "#fh-taxonomy_canvas-taxonomyConfigBar",
-                            title: i18n_tour_step5_title,
-                            content: i18n_tour_step5_text,
-                            placement: "bottom",
-                            backdrop: true
-                        }, {
-                            element: "#fh-taxonomy_canvas-treenode-404684003",
-                            title: i18n_tour_step10_title,
-                            content: i18n_tour_step10_text,
-                            placement: "right",
-                            backdrop: true
-                        }, {
-                            element: "#fh-taxonomy_canvas-treeicon-404684003",
-                            title: i18n_tour_step11_title,
-                            content: i18n_tour_step11_text,
-                            placement: "right",
-                            backdrop: true
-                        }, {
-                            element: "#fh-tabs",
-                            title: i18n_tour_step2_5_title,
-                            content: i18n_tour_step2_5_text,
-                            placement: "bottom",
-                            backdrop: true,
-                            onNext: function(tour) {
-                                $('#fh-tabs li:eq(1) a').tab('show')
-                            }
-                        }, {
-                            element: "#fh-tabs-pane",
-                            title: i18n_tour_step3_title,
-                            content: i18n_tour_step3_text,
-                            placement: "right",
-                            backdrop: true
-                        }, {
-                            element: "#fh-search_canvas-searchConfigBar",
-                            title: i18n_tour_step6_title,
-                            content: i18n_tour_step6_text,
-                            placement: "bottom",
-                            backdrop: true
-                        }, {
-                            element: "#fh-search_canvas",
-                            title: i18n_tour_step12_title,
-                            content: i18n_tour_step12_text,
-                            placement: "right",
-                            backdrop: true
-                        }, {
-                            element: "#fh-search_canvas-historyButton",
-                            title: i18n_tour_step13_title,
-                            content: i18n_tour_step13_text,
-                            placement: "left",
-                            backdrop: true,
-                            onNext: function(tour) {
-                                $('#fh-tabs li:eq(0) a').tab('show')
-                            }
-                        }, {
-                            element: "#fh-cd1_canvas",
-                            title: i18n_tour_step4_title,
-                            content: i18n_tour_step4_text,
-                            placement: "left",
-                            backdrop: true
-                        }, {
-                            element: "#fh-cd1_canvas-configButton",
-                            title: i18n_tour_step7_title,
-                            content: i18n_tour_step7_text,
-                            placement: "left",
-                            backdrop: true
-                        },
-                        /*{
-                         element: "#fh-taxonomy_canvas-linkerButton",
-                         title: i18n_tour_step8_title,
-                         content: i18n_tour_step8_text,
-                         placement: "left",
-                         backdrop: true
-                         },
-                         {
-                         element: "#bp-taxonomy_canvas-subscribersMarker",
-                         title: i18n_tour_step9_title,
-                         content: i18n_tour_step9_text,
-                         placement: "right",
-                         backdrop: true
-                         },*/
-                        {
-                            element: "#details-tabs-fh-cd1_canvas",
-                            title: i18n_tour_step13_1_title,
-                            content: i18n_tour_step13_1_text,
-                            placement: "bottom",
-                            backdrop: true
-                        }, {
-                            element: "#fh-cd1_canvas-panelBody",
-                            title: i18n_tour_step13_2_title,
-                            content: i18n_tour_step13_2_text,
-                            placement: "left",
-                            backdrop: true,
-                            onNext: function(tour) {
-                                $('#details-tabs-fh-cd1_canvas li:eq(1) a').tab('show')
-                            }
-                        }, {
-                            element: "#fh-cd1_canvas-panelBody",
-                            title: i18n_tour_step13_3_title,
-                            content: i18n_tour_step13_3_text,
-                            placement: "left",
-                            backdrop: true
-                        }, {
-                            element: "#fh-cd1_canvas-attributesClip",
-                            title: i18n_tour_step14_title,
-                            content: i18n_tour_step14_text,
-                            placement: "left",
-                            backdrop: true,
-                            onNext: function(tour) {
-                                initialize()
-                            }
-                        }, {
-                            element: "nothing",
-                            title: i18n_tour_step15_title,
-                            content: i18n_tour_step15_text,
-                            placement: "bottom",
-                            orphan: true,
-                            backdrop: true
+                        element: "nothing",
+                        title: i18n_tour_step1_fh_title,
+                        content: i18n_tour_step1_fh_text,
+                        placement: "bottom",
+                        orphan: true,
+                        backdrop: false,
+                        onShow: function (tour) {
+                            switchToFullHeight(204351007, 138875005)
                         }
+                    }, {
+                        element: "#fh-tabs-pane",
+                        title: i18n_tour_step2_title,
+                        content: i18n_tour_step2_text,
+                        placement: "right",
+                        backdrop: true
+                    }, {
+                        element: "#fh-taxonomy_canvas-taxonomyConfigBar",
+                        title: i18n_tour_step5_title,
+                        content: i18n_tour_step5_text,
+                        placement: "bottom",
+                        backdrop: true
+                    }, {
+                        element: "#fh-taxonomy_canvas-treenode-404684003",
+                        title: i18n_tour_step10_title,
+                        content: i18n_tour_step10_text,
+                        placement: "right",
+                        backdrop: true
+                    }, {
+                        element: "#fh-taxonomy_canvas-treeicon-404684003",
+                        title: i18n_tour_step11_title,
+                        content: i18n_tour_step11_text,
+                        placement: "right",
+                        backdrop: true
+                    }, {
+                        element: "#fh-tabs",
+                        title: i18n_tour_step2_5_title,
+                        content: i18n_tour_step2_5_text,
+                        placement: "bottom",
+                        backdrop: true,
+                        onNext: function (tour) {
+                            $('#fh-tabs li:eq(1) a').tab('show')
+                        }
+                    }, {
+                        element: "#fh-tabs-pane",
+                        title: i18n_tour_step3_title,
+                        content: i18n_tour_step3_text,
+                        placement: "right",
+                        backdrop: true
+                    }, {
+                        element: "#fh-search_canvas-searchConfigBar",
+                        title: i18n_tour_step6_title,
+                        content: i18n_tour_step6_text,
+                        placement: "bottom",
+                        backdrop: true
+                    }, {
+                        element: "#fh-search_canvas",
+                        title: i18n_tour_step12_title,
+                        content: i18n_tour_step12_text,
+                        placement: "right",
+                        backdrop: true
+                    }, {
+                        element: "#fh-search_canvas-historyButton",
+                        title: i18n_tour_step13_title,
+                        content: i18n_tour_step13_text,
+                        placement: "left",
+                        backdrop: true,
+                        onNext: function (tour) {
+                            $('#fh-tabs li:eq(0) a').tab('show')
+                        }
+                    }, {
+                        element: "#fh-cd1_canvas",
+                        title: i18n_tour_step4_title,
+                        content: i18n_tour_step4_text,
+                        placement: "left",
+                        backdrop: true
+                    }, {
+                        element: "#fh-cd1_canvas-configButton",
+                        title: i18n_tour_step7_title,
+                        content: i18n_tour_step7_text,
+                        placement: "left",
+                        backdrop: true
+                    },
+                    /*{
+                     element: "#fh-taxonomy_canvas-linkerButton",
+                     title: i18n_tour_step8_title,
+                     content: i18n_tour_step8_text,
+                     placement: "left",
+                     backdrop: true
+                     },
+                     {
+                     element: "#bp-taxonomy_canvas-subscribersMarker",
+                     title: i18n_tour_step9_title,
+                     content: i18n_tour_step9_text,
+                     placement: "right",
+                     backdrop: true
+                     },*/
+                    {
+                        element: "#details-tabs-fh-cd1_canvas",
+                        title: i18n_tour_step13_1_title,
+                        content: i18n_tour_step13_1_text,
+                        placement: "bottom",
+                        backdrop: true
+                    }, {
+                        element: "#fh-cd1_canvas-panelBody",
+                        title: i18n_tour_step13_2_title,
+                        content: i18n_tour_step13_2_text,
+                        placement: "left",
+                        backdrop: true,
+                        onNext: function (tour) {
+                            $('#details-tabs-fh-cd1_canvas li:eq(1) a').tab('show')
+                        }
+                    }, {
+                        element: "#fh-cd1_canvas-panelBody",
+                        title: i18n_tour_step13_3_title,
+                        content: i18n_tour_step13_3_text,
+                        placement: "left",
+                        backdrop: true
+                    }, {
+                        element: "#fh-cd1_canvas-attributesClip",
+                        title: i18n_tour_step14_title,
+                        content: i18n_tour_step14_text,
+                        placement: "left",
+                        backdrop: true,
+                        onNext: function (tour) {
+                            initialize()
+                        }
+                    }, {
+                        element: "nothing",
+                        title: i18n_tour_step15_title,
+                        content: i18n_tour_step15_text,
+                        placement: "bottom",
+                        orphan: true,
+                        backdrop: true
+                    }
                     ],
                     storage: false,
                     debug: false,
@@ -1492,10 +1670,6 @@
                 $("#welcome-perspective-community-content").css({
                     "display": "block"
                 });
-            } else if (options.previewBrowser) {
-                $("#welcome-perspective-preview").css({
-                    "display": "block"
-                });
             } else {
                 $("#welcome-perspective").css({
                     "display": "block"
@@ -1516,7 +1690,7 @@
             $("#responsive-perspective").css({
                 "display": "none"
             });
-            $("#perspectiveLabel").html("<em>...</em>");
+            $("#perspectiveLabel").html("<span class='i18n' data-i18n-id='i18n_full_perspective'>" + jQuery.i18n.prop('i18n_full_perspective') + "</span>");
             $('.more-fields-button').popover('hide');
         }
 
@@ -1524,7 +1698,7 @@
             currentPerspective = "browsing";
             postal.unsubscribeFor();
             if (typeof componentsRegistry != "undefined") {
-                $.each(componentsRegistry, function(i, field) {
+                $.each(componentsRegistry, function (i, field) {
                     field = null;
                 });
                 componentsRegistry = [];
@@ -1566,7 +1740,7 @@
             cdPanel2.subscribe(spa);
             cdPanel2.setupCanvas();
 
-            loadLanguageRefsets().then(function(result) {
+            loadLanguageRefsets().then(function (result) {
                 cdPanel1.setLangugeRefsets(result.languageRefsets);
                 cdPanel2.setLangugeRefsets(result.languageRefsets);
                 spa.setLanguageRefsets(result.languageRefsets);
@@ -1586,7 +1760,7 @@
                 orientation: 'vertical',
                 limit: 20
             });
-            $.each(componentsRegistry, function(i, field) {
+            $.each(componentsRegistry, function (i, field) {
                 field.loadMarkers();
             });
         }
@@ -1609,7 +1783,7 @@
             currentPerspective = "compare_concepts";
             postal.unsubscribeFor();
             if (typeof componentsRegistry != "undefined") {
-                $.each(componentsRegistry, function(i, field) {
+                $.each(componentsRegistry, function (i, field) {
                     field = null;
                 });
                 componentsRegistry = [];
@@ -1649,7 +1823,7 @@
             cdPanel1.setupCanvas();
             cdPanel2.setupCanvas();
 
-            loadLanguageRefsets().then(function(result) {
+            loadLanguageRefsets().then(function (result) {
                 cdPanel1.setLangugeRefsets(result.languageRefsets);
                 cdPanel2.setLangugeRefsets(result.languageRefsets);
                 spa.setLanguageRefsets(result.languageRefsets);
@@ -1661,7 +1835,7 @@
             $('#comparing-concept-details').split({
                 orientation: 'vertical'
             });
-            $.each(componentsRegistry, function(i, field) {
+            $.each(componentsRegistry, function (i, field) {
                 field.loadMarkers();
             });
         }
@@ -1670,7 +1844,7 @@
             currentPerspective = "compare_hierarchies";
             postal.unsubscribeFor();
             if (typeof componentsRegistry != "undefined") {
-                $.each(componentsRegistry, function(i, field) {
+                $.each(componentsRegistry, function (i, field) {
                     field = null;
                 });
                 componentsRegistry = [];
@@ -1713,7 +1887,7 @@
             cdPanel1.subscribe(spa);
             cdPanel1.setupCanvas();
 
-            loadLanguageRefsets().then(function(result) {
+            loadLanguageRefsets().then(function (result) {
                 cdPanel1.setLangugeRefsets(result.languageRefsets);
                 spa.setLanguageRefsets(result.languageRefsets);
                 tx1.setLanguageRefsets(result.languageRefsets);
@@ -1732,7 +1906,7 @@
             $('#search-cd-wrapper').split({
                 orientation: 'vertical'
             });
-            $.each(componentsRegistry, function(i, field) {
+            $.each(componentsRegistry, function (i, field) {
                 field.loadMarkers();
             });
         }
@@ -1757,7 +1931,7 @@
             currentPerspective = "full";
             postal.unsubscribeFor();
             if (typeof componentsRegistry != "undefined") {
-                $.each(componentsRegistry, function(i, field) {
+                $.each(componentsRegistry, function (i, field) {
                     field = null;
                 });
                 componentsRegistry = [];
@@ -1813,7 +1987,7 @@
 
             options.fhTaxonomyCanvasLoaded = false;
             $("#fh-taxonomies_canvas-li").unbind();
-            $("#fh-taxonomies_canvas-li").click(function() {
+            $("#fh-taxonomies_canvas-li").click(function () {
                 if (!options.fhTaxonomyCanvasLoaded) {
                     tpt.updateCanvas();
                     options.fhTaxonomyCanvasLoaded = true;
@@ -1827,7 +2001,7 @@
             cdPanel1.subscribe(ref);
             cdPanel1.setupCanvas();
 
-            loadLanguageRefsets().then(function(result) {
+            loadLanguageRefsets().then(function (result) {
                 cdPanel1.setLangugeRefsets(result.languageRefsets);
                 spa.setLanguageRefsets(result.languageRefsets);
                 ref.renderRefsets(result.referenceSets);
@@ -1852,7 +2026,7 @@
                 $('#fh-tabs li:eq(1) a').tab('show');
                 searchInPanel(spa.divElement.id, decodeURI(QueryString.searchTerm));
             }
-            $.each(componentsRegistry, function(i, field) {
+            $.each(componentsRegistry, function (i, field) {
                 if (field.loadMarkers)
                     field.loadMarkers();
             });
@@ -1868,7 +2042,7 @@
             currentPerspective = "responsive";
             postal.unsubscribeFor();
             if (typeof componentsRegistry != "undefined") {
-                $.each(componentsRegistry, function(i, field) {
+                $.each(componentsRegistry, function (i, field) {
                     field = null;
                 });
                 componentsRegistry = [];
@@ -1911,7 +2085,7 @@
             cdPanel2.subscribe(spa);
             cdPanel2.setupCanvas();
 
-            loadLanguageRefsets().then(function(result) {
+            loadLanguageRefsets().then(function (result) {
                 cdPanel1.setLangugeRefsets(result.languageRefsets);
                 cdPanel2.setLangugeRefsets(result.languageRefsets);
                 spa.setLanguageRefsets(result.languageRefsets);
@@ -1933,7 +2107,7 @@
                 orientation: 'vertical',
                 limit: 20
             });
-            $.each(componentsRegistry, function(i, field) {
+            $.each(componentsRegistry, function (i, field) {
                 field.loadMarkers();
             });
         }
@@ -1944,22 +2118,20 @@
             if (options.release.length > 0 && options.release !== 'None') {
                 branch = branch + "/" + options.release;
             };
-            if (!options.serverUrl.includes('snowowl')) {
-                $.ajaxSetup({
-                    headers: {
-                        'Accept-Language': options.languages
-                    }
-                });
-            };
-            $.getJSON(options.serverUrl + "/browser/" + branch + "/members?active=true&limit=1", function(result) {}).done(function(result) {
+            $.ajaxSetup({
+                headers: {
+                    'Accept-Language': options.languages
+                }
+            });
+            $.getJSON(options.serverUrl + "/browser/" + branch + "/members?active=true&limit=1", function (result) { }).done(function (result) {
                 var languageRefsets = [];
-                Object.keys(result.referenceSets).forEach(function(key) {
-                    if (result.referenceSets[key].referenceSetType.id === '900000000000506000') {
+                Object.keys(result.referenceSets).forEach(function (key) {
+                    if (result.referenceSets[key].referenceSetType && result.referenceSets[key].referenceSetType.id === '900000000000506000') {
                         languageRefsets.push(result.referenceSets[key]);
                     }
                 });
 
-                languageRefsets.sort(function(a, b) {
+                languageRefsets.sort(function (a, b) {
                     if (a.conceptId === '900000000000509007') {
                         return -1;
                     }
@@ -1973,7 +2145,7 @@
                     'referenceSets': result,
                     'languageRefsets': languageRefsets
                 });
-            }).fail(function() {
+            }).fail(function () {
                 dfd.reject();
             });
 
@@ -2074,73 +2246,85 @@
                             });
                         } else {
                             $(this).html(translation);
-                        }
+                            $(this).fadeIn("slow");
+                        });
                     } else {
-                        console.log($(this).attr('data-i18n-id') + " = " + $(this).html());
+                        $(this).html(translation);
                     }
-                });
-
-                var i18n_search_placeholder = jQuery.i18n.prop('i18n_search_placeholder');
-                var i18n_ecl_search_option_placeholder = jQuery.i18n.prop('i18n_ecl_search_option_placeholder');
-                if (fade) {
-                    $('#fh-search_canvas-searchBox').fadeOut("slow", function() {
-                        $('#fh-search_canvas-searchBox').attr('placeholder', i18n_search_placeholder);
-                        $('#fh-search_canvas-searchBox').fadeIn("slow");
-                    });
-                    $('#fh-query_canvas-searchBoxOption').fadeOut("slow", function() {
-                        $('#fh-query_canvas-searchBoxOption').attr('placeholder', i18n_ecl_search_option_placeholder);
-                        $('#fh-query_canvas-searchBoxOption').fadeIn("slow");
-                    });
                 } else {
-                    $('#fh-search_canvas-searchBox').attr('placeholder', i18n_search_placeholder);
-                    $('#fh-query_canvas-searchBoxOption').attr('placeholder', i18n_ecl_search_option_placeholder);
+                    console.log($(this).attr('data-i18n-id') + " = " + $(this).html());
                 }
+            });
 
-                initTour();
-                $("#navBarBrand").tooltip().tooltip('destroy');
-                $("#navBarBrand").tooltip({
-                    placement: 'bottom',
-                    trigger: 'hover',
-                    title: i18n_go_back_home,
-                    animation: true,
-                    delay: 1000
+            var i18n_search_placeholder = jQuery.i18n.prop('i18n_search_placeholder');
+            var i18n_ecl_search_option_placeholder = jQuery.i18n.prop('i18n_ecl_search_option_placeholder');
+            if (fade) {
+                $('#fh-search_canvas-searchBox').fadeOut("slow", function () {
+                    $('#fh-search_canvas-searchBox').attr('placeholder', i18n_search_placeholder);
+                    $('#fh-search_canvas-searchBox').fadeIn("slow");
                 });
-                $("#fh-search_canvas-historyButton").tooltip().tooltip('destroy');
-                $("#fh-search_canvas-historyButton").tooltip({
-                    placement: 'left',
-                    trigger: 'hover',
-                    title: i18n_history,
-                    animation: true,
-                    delay: 1000
+                $('#fh-query_canvas-searchBoxOption').fadeOut("slow", function () {
+                    $('#fh-query_canvas-searchBoxOption').attr('placeholder', i18n_ecl_search_option_placeholder);
+                    $('#fh-query_canvas-searchBoxOption').fadeIn("slow");
                 });
-                $("#fh-taxonomy_canvas-historyButton").tooltip().tooltip('destroy');
-                $("#fh-taxonomy_canvas-historyButton").tooltip({
-                    placement: 'left',
-                    trigger: 'hover',
-                    title: i18n_history,
-                    animation: true,
-                    delay: 1000
-                });
-                $("#fh-cd1_canvas-historyButton").tooltip().tooltip('destroy');
-                $("#fh-cd1_canvas-historyButton").tooltip({
-                    placement: 'left',
-                    trigger: 'hover',
-                    title: i18n_history,
-                    animation: true,
-                    delay: 1000
-                });
+            } else {
+                $('#fh-search_canvas-searchBox').attr('placeholder', i18n_search_placeholder);
+                $('#fh-query_canvas-searchBoxOption').attr('placeholder', i18n_ecl_search_option_placeholder);
             }
+
+            initTour();
+            $("#navBarBrand").tooltip().tooltip('destroy');
+            $("#navBarBrand").tooltip({
+                placement: 'bottom',
+                trigger: 'hover',
+                title: i18n_go_back_home,
+                animation: true,
+                delay: 1000
+            });
+            $("#fh-search_canvas-historyButton").tooltip().tooltip('destroy');
+            $("#fh-search_canvas-historyButton").tooltip({
+                placement: 'left',
+                trigger: 'hover',
+                title: i18n_history,
+                animation: true,
+                delay: 1000
+            });
+            $("#fh-taxonomy_canvas-historyButton").tooltip().tooltip('destroy');
+            $("#fh-taxonomy_canvas-historyButton").tooltip({
+                placement: 'left',
+                trigger: 'hover',
+                title: i18n_history,
+                animation: true,
+                delay: 1000
+            });
+            $("#fh-cd1_canvas-historyButton").tooltip().tooltip('destroy');
+            $("#fh-cd1_canvas-historyButton").tooltip({
+                placement: 'left',
+                trigger: 'hover',
+                title: i18n_history,
+                animation: true,
+                delay: 1000
+            });
         }
     </script>
     <script>
         function openEclBuilder() {
             var eclString = $('#fh-query_canvas-ExpText').val();
-
-            $("body").append("<ecl-builder id='ecl-builder' branch=" + options.edition + " api-url='/snowstorm/snomed-ct' ecl-string='" + eclString + "'></ecl-builder>");
-
+            var valueContainsApostropheChar = false;
+            if (eclString && eclString.indexOf("'") >= 0) {
+                valueContainsApostropheChar = true;
+            }
+            if (valueContainsApostropheChar) {
+                $('body').append('<ecl-builder id="ecl-builder" branch=' + options.edition + ' api-url="/snowstorm/snomed-ct" ecl-string="' + eclString + '"></ecl-builder>');
+            } else {
+                $("body").append("<ecl-builder id='ecl-builder' branch=" + options.edition + " api-url='/snowstorm/snomed-ct' ecl-string='" + eclString + "'></ecl-builder>");
+            }
             const el = document.querySelector('ecl-builder');
             el.addEventListener('output', e => {
                 $('#fh-query_canvas-ExpText').val(e.detail);
+                if (typeof options.setEcl !== 'undefined') {
+                    options.setEcl(e.detail);
+                }
             });
         }
     </script>
@@ -2158,7 +2342,7 @@
             -o-transform: rotate(-45deg);
             transform: rotate(-45deg);
         }
-        
+
         .ribbon span {
             border: 1px solid #faa;
             color: #fff;
@@ -2169,11 +2353,11 @@
             text-align: center;
             text-decoration: none;
         }
-        
+
         .navbar-brand {
             margin-top: 4px;
         }
-        
+
         .navbar .navbar-btn {
             margin-left: 10px;
         }
@@ -2201,15 +2385,6 @@
   </div>
 
 <body onLoad="getCopyrightYear(); determineServer();" style="height: 100%; display: block;">
-    <div id="cookiescript" style="top: 0px; background-color: rgb(17, 17, 17); z-index: 999999; opacity: 1; position: fixed; padding: 15px 0px; width: 100%; left: 0px; font-size: 13px; font-weight: normal; text-align: left; letter-spacing: normal; color: rgb(0, 0, 0); font-family: Arial, sans-serif; box-shadow: rgb(0, 0, 0) 0px 0px 8px; display: none;">
-        <div style="margin: 0px 10px; font-size: 13px; font-weight: bold; text-align: center; color: rgb(255, 255, 255); font-family: Arial, sans-serif; line-height: 23px; letter-spacing: normal;">This website uses cookies to improve user experience. By using our website you consent to all cookies in accordance with our Cookie Policy. &nbsp;&nbsp;
-            <a href="https://www.iubenda.com/privacy-policy/46600952/cookie-policy" target="_blank" style="text-decoration: underline; color: rgb(255, 255, 255); cursor: pointer; padding: 0px; margin: 0px; white-space: nowrap; display: inline-block;">Read more</span></a>
-            <div id="cookiescript_accept" style="border-radius: 5px; border: 0px; padding: 6px 10px; font-weight: bold; cursor: pointer; margin: 0px 10px 0px 15px; transition: all 0.25s ease 0s; display: inline; text-shadow: rgb(0, 0, 0) 0px 0px 2px; white-space: nowrap; background-color: rgb(91, 183, 91); color: rgb(255, 255, 255);">I agree</span>
-            </div>
-            <divstyle="width: 1px; height: 1px; float: left;">
-        </div>
-    </div>
-    </div>
     <nav class="navbar navbar-default  navbar-static-top" role="navigation">
         <div>
             <!-- Brand and toggle get grouped for better mobile display -->
@@ -2226,7 +2401,8 @@
                             &nbsp;&nbsp;SNOMED CT Browser</strong></a>
             </div>
             <!-- Collect the nav links, forms, and other content for toggling -->
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1" style="padding-left: 20px; padding-right: 20px;">
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1"
+                style="padding-left: 20px; padding-right: 20px;">
                 <ul class="nav navbar-nav navbar-right">
                     <li class="navbar-btn" id="edition-selector" style="display: none">
                         <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
@@ -2237,21 +2413,29 @@
                     </li>
                     <li class="navbar-btn" id="version-selector" style="display: none">
                         <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
-                                <span class="i18n" data-i18n-id="i18n_version">Version</span>:&nbsp;<span id="versionLabel"></span> <span class="caret"></span>
-                            </button>
-                        <ul class="dropdown-menu" id="versionSwitcher" role="menu" style="max-height: 600px;overflow: auto;">
+                            <span class="i18n" data-i18n-id="i18n_version">Version</span>:&nbsp;<span
+                                id="versionLabel"></span> <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" id="versionSwitcher" role="menu"
+                            style="max-height: 600px;overflow: auto;">
                         </ul>
                     </li>
 
                     <li class="navbar-btn" id="perspective-selector">
                         <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-                                <span class="i18n" data-i18n-id="i18n_perspective">Perspective</span>:&nbsp;<span id="perspectiveLabel"><em>...</em></span> <span class="caret"></span>
-                            </button>
+                            <span class="i18n" data-i18n-id="i18n_perspective">Perspective</span>:&nbsp;<span
+                                id="perspectiveLabel"><em>...</em></span> <span class="caret"></span>
+                        </button>
                         <ul class="dropdown-menu">
-                            <li><a href="javascript:void(0);" onclick="switchToFullHeight();"><span class="i18n" data-i18n-id="i18n_full_perspective">Full</span></a></li>
-                            <li><a href="javascript:void(0);" onclick="switchToComparingConcepts();"><span class="i18n" data-i18n-id="i18n_comp_concepts_perspective">Comparing concepts</span></a></li>
-                            <li><a href="javascript:void(0);" onclick="switchToComparingTaxonomies(404684003, 138875005, 138875005);"><span class="i18n" data-i18n-id="i18n_comp_hier_perspective">Comparing hierarchy</span></a></li>
-                            <li><a href="javascript:void(0);" onclick="switchToResponsiveLayout(404684003, 404684003, 138875005);"><span class="i18n" data-i18n-id="i18n_responsive_perspective">Responsive (tablets, phones)</span></a></li>
+                            <li><a href="javascript:void(0);" onclick="switchToFullHeight();"><span class="i18n"
+                                        data-i18n-id="i18n_full_perspective">Full</span></a></li>
+                            <li><a href="javascript:void(0);" onclick="switchToComparingConcepts();"><span class="i18n"
+                                        data-i18n-id="i18n_comp_concepts_perspective">Comparing concepts</span></a></li>
+                            <li><a href="javascript:void(0);"
+                                    onclick="switchToComparingTaxonomies(404684003, 138875005, 138875005);"><span
+                                        class="i18n" data-i18n-id="i18n_comp_hier_perspective">Comparing
+                                        hierarchy</span></a></li>
+                            <!--                            <li><a href="javascript:void(0);" onclick="switchToResponsiveLayout(404684003, 404684003, 138875005);"><span class="i18n" data-i18n-id="i18n_responsive_perspective">Responsive (tablets, phones)</span></a></li>-->
                         </ul>
                     </li>
 
@@ -2270,21 +2454,27 @@
                         </script>   -->
                     </li>
                     <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="i18n" data-i18n-id="i18n_about">Help</span> <b class="caret"></b></a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="i18n"
+                                data-i18n-id="i18n_about">Help</span> <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                             <li><a href="http://snomed.org/snomedtools-privacy" target=_blank class="i18n" data-i18n-id="i18n_SNOMED_International_Privacy_Policy">SNOMED International Privacy Policy</a></li>
                             <li class="divider"></li>
-                            <li><a href="https://github.com/IHTSDO/sct-browser-frontend" target="_blank"><span class="i18n" data-i18n-id="i18n_github">See the code on GitHub</span></a></li>
+                            <li><a href="https://docs.snomed.org/snomed-ct-user-guides/snomed-ct-browser-guide/"
+                                    target="_blank">User Guide</a></li>
                             <li class="divider"></li>
                             <li><a href="https://www.snomed.org/snomed-ct/software-tools" target="_blank" class="i18n" data-i18n-id="i18n_SNOMED_International_Tooling">SNOMED International Tooling</a></li>
                             <li><a href="http://www.snomed.org" target="_blank">SNOMED International</a></li>
                         </ul>
                     </li>
                     <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span id="nav-selected-flag"></span> <b class="caret"></b></a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span id="nav-selected-flag"></span>
+                            <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                             <li>
-                                <a href="javascript:void(0);" onclick="switchLanguage('en', 'img/flags/us.png', true);"><img src="img/flags/us.png" /> English</a>
+                                <a href="javascript:void(0);" onclick="switchLanguage('en', 'us', true);">
+                                    <div class="phoca-flagbox" style="width:16px;height:11px"><span
+                                            class="phoca-flag us" style="width:100%;height:100%"></span></div> English
+                                </a>
                             </li>
                             <!-- <li>
                                 <a href="javascript:void(0);" onclick="switchLanguage('da', 'img/flags/dk.png', true);"><img src="img/flags/dk.png" /> Dansk</a>
@@ -2293,7 +2483,10 @@
                                 <a href="javascript:void(0);" onclick="switchLanguage('es', 'img/flags/es.png', true);"><img src="img/flags/es.png" /> Español</a>
                             </li> -->
                             <li>
-                                <a href="javascript:void(0);" onclick="switchLanguage('fr', 'img/flags/fr.png', true);"><img src="img/flags/fr.png" /> Français</a>
+                                <a href="javascript:void(0);" onclick="switchLanguage('fr', 'fr', true);">
+                                    <div class="phoca-flagbox" style="width:16px;height:11px"><span
+                                            class="phoca-flag fr" style="width:100%;height:100%"></span></div> Français
+                                </a>
                             </li>
                             <!-- <li>
                                 <a href="javascript:void(0);" onclick="switchLanguage('pt', 'img/flags/pt.png', true);"><img src="img/flags/pt.png" /> Português</a>
@@ -2302,7 +2495,9 @@
                                 <a href="javascript:void(0);" onclick="switchLanguage('sv', 'img/flags/se.png', true);"><img src="img/flags/se.png" /> Swedish</a>
                             </li> -->
                             <li class="divider"></li>
-                            <li style="margin: 5px;"><em><span class="i18n text-muted small" data-i18n-id="i18n_translation_warning">This option only applies to the Browser. Terminology language depends on the selected edition.</span></em></li>
+                            <li style="margin: 5px;"><em><span class="i18n text-muted small"
+                                        data-i18n-id="i18n_translation_warning">This option only applies to the Browser.
+                                        Terminology language depends on the selected edition.</span></em></li>
                         </ul>
                     </li>
                     <li>
@@ -2322,52 +2517,95 @@
         <!-- Welcome Perspective -->
         <div id="welcome-perspective" class="bperspective">
             <div class="jumbotron">
-                <h1><span class="i18n" data-i18n-id="i18n_welcome_2nd">SNOMED International's SNOMED CT Browser</span></h1>
-                <p><span class="i18n" data-i18n-id="i18n_home1">SNOMED International's SNOMED CT Browser provides ways to browse and search SNOMED CT. The browser has been implemented as part of development within the SNOMED International Open Tooling Framework, by SNOMED International and its development partners</span></p>
-                <p><span class="i18n" data-i18n-id="i18n_home5">The Browser is provided by the SNOMED International to anyone for reference purposes and the interface and REST APIs are <strong>not</strong> to be used as part of production systems. There are other tools developed by SNOMED International for Members for the use in health care settings.<br>Any abuse of the REST APIs will result in the offending IP address being banned from accessing the browser.</span></p>
-                <p><span class="i18n" data-i18n-id="i18n_home3">Please provide any feedback by clicking on the feedback button at the top of the page. Your feedback is essential to the evolution and improvement of this service.</span></p>
-                <p class="i18n" data-i18n-id="i18n_home9">This site has been optimized for the Google Chrome browser and <strong>it will not work with Internet Explorer.</strong></p>
-                <h2><span class="i18n" data-i18n-id="i18n_international_editions">International Editions</span></h2>
-                <p id="international_editions" style="margin-bottom : 0px"></p>
-                <p id="international_stats" style="margin-bottom : 0px"></p>
-                <p id="international_mrcm" style="margin-bottom : 0px"></p>
-                <h2 style="margin-top : 2px"><span class="i18n" data-i18n-id="i18n_local_extensions">Local Extensions</span></h2>
+                <h1><span class="i18n" data-i18n-id="i18n_welcome_2nd">SNOMED International's SNOMED CT Browser</span>
+                </h1>
+                <p><span class="i18n" data-i18n-id="i18n_home1">SNOMED International's SNOMED CT Browser provides ways
+                        to browse and search SNOMED CT. The browser has been implemented as part of development within
+                        the SNOMED International Open Tooling Framework, by SNOMED International and its development
+                        partners</span></p>
+                <p><span class="i18n" data-i18n-id="i18n_home5">The Browser is provided by the SNOMED International to
+                        anyone for reference purposes and the interface and REST APIs are <strong>not</strong> to be
+                        used as part of production systems. There are other tools developed by SNOMED International for
+                        Members for the use in health care settings.<br>Any abuse of the REST APIs will result in the
+                        offending IP address being banned from accessing the browser.</span></p>
+                <p><span class="i18n" data-i18n-id="i18n_home3">Please provide any feedback by clicking on the feedback
+                        button at the top of the page. Your feedback is essential to the evolution and improvement of
+                        this service.</span></p>
+                <p class="i18n" data-i18n-id="i18n_home9">This site has been optimized for the Google Chrome browser and
+                    <strong>it will not work with Internet Explorer.</strong></p>
+
+                <div class="row">
+                    <div class="col-md-6" style="padding-left:15px;">
+                        <h2><span class="i18n" data-i18n-id="i18n_international_editions">International Editions</span>
+                        </h2>
+                        <div id="international_editions" style="margin-bottom : 0px;"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <h2><span class="i18n" data-i18n-id="i18n_international_tools">Additional Information</span>
+                        </h2>
+                        <div id="international_tools" style="margin-bottom : 0px"></div>
+                    </div>
+                </div>
+                <h2 style="margin-top : 2px"><span class="i18n" data-i18n-id="i18n_local_extensions">Local
+                        Extensions</span></h2>
                 <p id="local_editions" style="margin-bottom : 0px"></p>
                 <p id="multi-extension-search" style="display: none;">
-                    <a class="btn btn-primary btn-lg" role="button" onclick="window.location.href='multi-extension-search.html'" style="width: 160px;">&nbsp;&nbsp;&nbsp;<span class="i18n" data-i18n-id="i18n_go_browsing">Go browsing...</span><br><span class="small">All Editions</span><br><span id="extension-flags" style="font-size: 10px"></span></a>
+                    <a class="btn btn-primary btn-lg" role="button"
+                        onclick="window.location.href='multi-extension-search.html'"
+                        style="width: 160px;">&nbsp;&nbsp;&nbsp;<span class="i18n" data-i18n-id="i18n_go_browsing">Go
+                            browsing...</span><br><span class="small">All Editions</span><br><span id="extension-flags"
+                            style="font-size: 10px"></span></a>
                 </p>
                 <p>
                     &nbsp;&nbsp;<span class="i18n" data-i18n-id="i18n_or">or</span>&nbsp;&nbsp;
-                    <a class="btn btn-primary " role="button" onclick="tourStart();"><span class="i18n" data-i18n-id="i18n_take_tour">take the Tour...</span></a></p>
+                    <a class="btn btn-primary " role="button" onclick="tourStart();"><span class="i18n"
+                            data-i18n-id="i18n_take_tour">take the Tour...</span></a>
+                </p>
                 <h2 style="margin-top : 2px">
                     <span class="i18n" data-i18n-id="i18n_home10">Externally Hosted Extensions</span>
                 </h2>
-                <a class="btn btn-primary btn-lg" role="button" style="margin-bottom : 15px" href="https://termbrowser.nhs.uk/" target="_blank"><img src="img/flags/gb.png" style="">&nbsp;&nbsp;&nbsp;<span class="i18n" data-i18n-id="i18n_go_browsing">Go browsing...</span><br><span class="small">United Kingdom edition<br>(hosted by the UK)</span></a>
-                <p><span class="i18n" data-i18n-id="i18n_home8">Many thanks to the SNOMED International Member countries who have provided their extensions in this browser. If you would like to enquire further about any of the Member country extensions in this browser, please contact the relevant National Release Center via the URL's below:</span></p>
-                <p class="lead">
-                    <img src="img/flags/ar.png">&nbsp;&nbsp;&nbsp;<a href="https://www.argentina.gob.ar/salud/snomed" target="_blank">SNOMED Argentina</a>
-                    <br><img src="img/flags/au.png">&nbsp;&nbsp;&nbsp;<a href="https://www.digitalhealth.gov.au/" target="_blank">Australian Digital Health Agency</a>
-                    <br><img src="img/flags/be.png">&nbsp;&nbsp;&nbsp;<a href="http://www.terminology-center.be/" target="_blank">Federal Public Service Health, Food Chain Safety and Environment, Belgium</a>
-                    <br><img src="img/flags/ca.png">&nbsp;&nbsp;&nbsp;<a href="https://ic.infoway-inforoute.ca/" target="_blank">Canada Health Infoway, Canada</a>
-                    <br><img src="img/flags/dk.png">&nbsp;&nbsp;&nbsp;<a href="https://sundhedsdatastyrelsen.dk/" target="_blank">The Danish Health Data Authority, Denmark</a>
-                    <br><img src="img/flags/nl.png">&nbsp;&nbsp;&nbsp;<a href="https://www.nictiz.nl/" target="_blank">Nictiz, Netherlands</a>
-                    <br><img src="img/flags/se.png">&nbsp;&nbsp;&nbsp;<a href="https://www.socialstyrelsen.se" target="_blank">The National Board of Health and Welfare, Sweden</a>
-                    <br><img src="img/flags/gb.png">&nbsp;&nbsp;&nbsp;<a href="https://digital.nhs.uk/article/290/Terminology-and-Classifications" target="_blank">UK Terminology Centre, NHS Digital, United Kingdom</a>
-                    <br><img src="img/flags/us.png">&nbsp;&nbsp;&nbsp;<a href="http://www.nlm.nih.gov/" target="_blank">National Library of Medicine (NLM), United States</a>
-                    <br><img src="img/flags/uy.png">&nbsp;&nbsp;&nbsp;<a href="http://www.agesic.gub.uy/innovaportal/v/4425/1/agesic/programa-saluduy.html" target="_blank">Salud.uy, Uruguay</a>
-                    <br><img src="img/flags/nz.png">&nbsp;&nbsp;&nbsp;<a href="https://www.health.govt.nz/nz-health-statistics/classification-and-terminology/new-zealand-snomed-ct-national-release-centre" target="_blank">New Zealand SNOMED CT National Release Centre</a>
+                <a class="btn btn-primary btn-lg" role="button" style="margin-bottom : 15px"
+                    href="https://termbrowser.nhs.uk/" target="_blank">
+                    <div class="phoca-flagbox" style="width:16px;height:11px"><span class="phoca-flag gb"
+                            style="width:100%;height:100%"></span></div>&nbsp;&nbsp;&nbsp;<span class="i18n"
+                        data-i18n-id="i18n_go_browsing">Go browsing...</span><br><span class="small">United Kingdom
+                        edition<br>(hosted by the UK)</span>
+                </a>
+                <a class="btn btn-primary btn-lg" role="button" style="margin-bottom : 15px; margin-left: 2px"
+                    href="https://snomedsns.es/" target="_blank">
+                    <div class="phoca-flagbox" style="width:16px;height:11px"><span class="phoca-flag es"
+                            style="width:100%;height:100%"></span></div>&nbsp;&nbsp;&nbsp;<span class="i18n"
+                        data-i18n-id="i18n_go_browsing">Go browsing...</span><br><span class="small">Spain
+                        edition<br>(hosted by Spain)</span>
+                </a>
+                <p><span class="i18n" data-i18n-id="i18n_home8">Many thanks to the SNOMED International Member countries
+                        who have provided their extensions in this browser. If you would like to enquire further about
+                        any of the Member country extensions in this browser, please contact the relevant National
+                        Release Center via the URL's below:</span></p>
+                <p class="lead" id="country-links-container">
+                    <!-- Country links will be dynamically generated here -->
                 </p>
 
-                <p><span class="i18n" data-i18n-id="i18n_home4">If you would like to get involved in the development, this code is available under an Apache v2 open source license. You can also find more information on the current backlog of feedback that is up for possible development here - <a href="https://confluence.ihtsdotools.org/display/TOOLS/SNOMED+CT+Browser" target="_blank">SNOMED International Browser service page</a></span></p>
+                <p><span class="i18n" data-i18n-id="i18n_home4">If you would like to get involved in the development,
+                        this code is available under an Apache v2 open source license. You can also find more
+                        information on the current backlog of feedback that is up for possible development here - <a
+                            href="https://confluence.ihtsdotools.org/display/TOOLS/SNOMED+CT+Browser"
+                            target="_blank">SNOMED International Browser service page</a></span></p>
             </div>
-            <p><span class="i18n" data-i18n-id="i18n_home6"><span class="btn-success"><em>Releases</em></span> will allow the selection of SNOMED CT content from the International Edition or other extensions, with specific dates.</span>
+            <p><span class="i18n" data-i18n-id="i18n_home6"><span class="btn-success"><em>Releases</em></span> will
+                    allow the selection of SNOMED CT content from the International Edition or other extensions, with
+                    specific dates.</span>
             </p>
-            <p><span class="i18n" data-i18n-id="i18n_home7"><span class="btn-primary"><em>Perspectives</em></span> are pre-defined browsing layouts for specific purposes. Use the <a href="javascript:void(0);" onclick="switchToResponsiveLayout(404684003, 404684003, 138875005);">responsive perspective</a>                for best results in tablets and phones.</span>
+            <p><span class="i18n" data-i18n-id="i18n_home7"><span class="btn-primary"><em>Perspectives</em></span> are
+                    pre-defined browsing layouts for specific purposes. Use the <a href="javascript:void(0);"
+                        onclick="switchToResponsiveLayout(404684003, 404684003, 138875005);">responsive perspective</a>
+                    for best results in tablets and phones.</span>
             </p>
-            <p><strong><a href="http://snomed.org/snomedtools-privacy" target=_blank>SNOMED International Privacy Policy</a></strong> <span id="csconsentlink">Cookie Settings</span></small>
+            <p><strong><a href="http://snomed.org/snomedtools-privacy" target=_blank>SNOMED International Privacy
+                        Policy</a></strong> <span id="csconsentlink">Cookie Settings</span></small>
             </p>
-            <p> <small><b>&copy; SNOMED International <span class="copyright_year"/></b> v<span>project_version</span><br></small>
-            </p>
+            <br>
+            <br>
         </div>
 
         <!-- Welcome Perspective DailyBuild -->
@@ -2385,7 +2623,7 @@
                 <p class="i18n" data-i18n-id="i18n_canada_home6">The Browser has been optimized for Google Chrome and will not work with Internet Explorer.</p>
 
                 <p id="dailybuild_editions" style="margin-bottom : 0px"></p>
-
+                <p id="dailybuild_mrcm" style="margin-bottom : 0px"></p>
                 <!--<a class="btn btn-primary btn-lg" role="button" onclick="switchRelease('Daily Build Edition 20200131', 'en-edition', 'v20200131', '', '900000000000509007', 'https://prod-dailybuild.ihtsdotools.org/api/snomed');switchToFullHeight(404684003, 138875005);"><img src="img/box-logo.png" style="height:20px">&nbsp;&nbsp;&nbsp;<span class="i18n" data-i18n-id="i18n_start_browsing">Start browsing...</span><br><span class="small">Daily Build edition</span></a>-->
                 </p>
                 <p id="lastUpdatedText"></p>
@@ -2402,13 +2640,20 @@ Your feedback is essential to the evolution and improvement of this service.
 Please provide any feedback by clicking on the feedback button at the top of the page or by emailing us at <a href="mailto:standards@infoway-inforoute.ca">standards@infoway-inforoute.ca</a>
                 </small></p> 
             </div>
-            <p><span class="i18n" data-i18n-id="i18n_home6"><span class="btn-success"><em>Releases</em></span> will allow the selection of SNOMED CT content from the International Edition or other extensions, with specific dates.</span>
+            <p><span class="i18n" data-i18n-id="i18n_home6"><span class="btn-success"><em>Releases</em></span> will
+                    allow the selection of SNOMED CT content from the International Edition or other extensions, with
+                    specific dates.</span>
             </p>
-            <p><span class="i18n" data-i18n-id="i18n_home7"><span class="btn-primary"><em>Perspectives</em></span> are pre-defined browsing layouts for specific purposes. Use the <a href="javascript:void(0);" onclick="switchToResponsiveLayout(404684003, 404684003, 138875005);">responsive perspective</a>                for best results in tablets and phones.</span>
+            <p><span class="i18n" data-i18n-id="i18n_home7"><span class="btn-primary"><em>Perspectives</em></span> are
+                    pre-defined browsing layouts for specific purposes. Use the <a href="javascript:void(0);"
+                        onclick="switchToResponsiveLayout(404684003, 404684003, 138875005);">responsive perspective</a>
+                    for best results in tablets and phones.</span>
             </p>
-            <p><strong><a href="http://snomed.org/snomedtools-privacy" target=_blank>SNOMED International Privacy Policy</a></strong></small>
+            <p><strong><a href="http://snomed.org/snomedtools-privacy" target=_blank>SNOMED International Privacy
+                        Policy</a></strong></small>
             </p>
-            <p> <small><b>&copy; SNOMED International <span class="copyright_year"/></b> v<span>project_version</span><br></small>
+            <p> <small><b>&copy; SNOMED International <span class="copyright_year" /></b>
+                    v<span>project_version</span><br></small>
             </p>
         </div>
 
@@ -2416,20 +2661,33 @@ Please provide any feedback by clicking on the feedback button at the top of the
         <div id="welcome-perspective-community-content" class="bperspective">
             <div class="jumbotron" style="background-color:darkgray">
                 <h1>Community Content Browser</h1>
-                <p style="padding-top:20px; font-weight: bold">For more information on the Community Content platform and the content provided within this browser visit - <a href="http://snomed.org/community-content">snomed.org/community-content</a></p>
-                <p>This browser contains the first, draft view into different content projects being created collaboratively by the SNOMED community in the <strong>Community Content area</strong>. This content has not been verified by SNOMED International
+                <p style="padding-top:20px; font-weight: bold">For more information on the Community Content platform
+                    and the content provided within this browser visit - <a
+                        href="http://snomed.org/community-content">snomed.org/community-content</a></p>
+                <p>This browser contains the first, draft view into different content projects being created
+                    collaboratively by the SNOMED community in the <strong>Community Content area</strong>. This content
+                    has not been verified by SNOMED International
                     but has been quality assured by those working on each project.</p>
-                <p>At this stage, it is strongly recommended to not use any new concepts or identifiers in production clinical data.</p>
-                <p>Future iterations of this browser will provide ways for you to provide feedback on any new content that you see in a project.</p>
+                <p>At this stage, it is strongly recommended to not use any new concepts or identifiers in production
+                    clinical data.</p>
+                <p>Future iterations of this browser will provide ways for you to provide feedback on any new content
+                    that you see in a project.</p>
                 <p id="commnunity_content_editions" style="margin-bottom : 0px"></p>
             </div>
-            <p><span class="i18n" data-i18n-id="i18n_home6"><span class="btn-success"><em>Releases</em></span> will allow the selection of SNOMED CT content from the International Edition or other extensions, with specific dates.</span>
+            <p><span class="i18n" data-i18n-id="i18n_home6"><span class="btn-success"><em>Releases</em></span> will
+                    allow the selection of SNOMED CT content from the International Edition or other extensions, with
+                    specific dates.</span>
             </p>
-            <p><span class="i18n" data-i18n-id="i18n_home7"><span class="btn-primary"><em>Perspectives</em></span> are pre-defined browsing layouts for specific purposes. Use the <a href="javascript:void(0);" onclick="switchToResponsiveLayout(404684003, 404684003, 138875005);">responsive perspective</a>                for best results in tablets and phones.</span>
+            <p><span class="i18n" data-i18n-id="i18n_home7"><span class="btn-primary"><em>Perspectives</em></span> are
+                    pre-defined browsing layouts for specific purposes. Use the <a href="javascript:void(0);"
+                        onclick="switchToResponsiveLayout(404684003, 404684003, 138875005);">responsive perspective</a>
+                    for best results in tablets and phones.</span>
             </p>
-            <p><strong><a href="http://snomed.org/snomedtools-privacy" target=_blank>SNOMED International Privacy Policy</a></strong></small>
+            <p><strong><a href="http://snomed.org/snomedtools-privacy" target=_blank>SNOMED International Privacy
+                        Policy</a></strong></small>
             </p>
-            <p> <small><b>&copy; SNOMED International <span class="copyright_year"/></b> v<span>project_version</span><br></small>
+            <p> <small><b>&copy; SNOMED International <span class="copyright_year" /></b>
+                    v<span>project_version</span><br></small>
             </p>
         </div>
 
@@ -2437,24 +2695,40 @@ Please provide any feedback by clicking on the feedback button at the top of the
         <div id="welcome-perspective-preview" class="bperspective">
             <div class="jumbotron">
                 <h1>SNOMED CT Concrete Domains Technical Preview Browser</h1>
-                <p style="padding-top:20px;">This Concrete Domains (CD) Technical Preview (TP) has been published in line with the SNOMED CT January 2021 International Edition, with drug concept strengths and counts expressed as concrete values in the new Relationships file.</p>
-                <p>It is a full RF2 International Edition package (as opposed to a standalone Delta file containing only Concrete Domains), containing all the January 2021 International content together with the new CD Relationships file. The release files
-                    offer a preview of the final release package contents and format once the CD transition is complete.</p>
-                <p>The CD TP Browser presents the TP content through the familiar SNOMED CT Browser user interface for ease of viewing and consideration of the impact and scope of the changes. Whilst browsing the content you can use the Feedback button in
+                <p style="padding-top:20px;">This Concrete Domains (CD) Technical Preview (TP) has been published in
+                    line with the SNOMED CT January 2021 International Edition, with drug concept strengths and counts
+                    expressed as concrete values in the new Relationships file.</p>
+                <p>It is a full RF2 International Edition package (as opposed to a standalone Delta file containing only
+                    Concrete Domains), containing all the January 2021 International content together with the new CD
+                    Relationships file. The release files
+                    offer a preview of the final release package contents and format once the CD transition is complete.
+                </p>
+                <p>The CD TP Browser presents the TP content through the familiar SNOMED CT Browser user interface for
+                    ease of viewing and consideration of the impact and scope of the changes. Whilst browsing the
+                    content you can use the Feedback button in
                     the header bar to send your thoughts and questions to SNOMED International via a pop-up form.</p>
-                <p style="padding-bottom:20px;">The CD TP Browser is optimized for the Google Chrome web browser, but may be usable in other modern web browsers, such as Safari, Firefox and Microsoft Edge. Internet Explorer is not supported since it is now deprecated by Microsoft in
+                <p style="padding-bottom:20px;">The CD TP Browser is optimized for the Google Chrome web browser, but
+                    may be usable in other modern web browsers, such as Safari, Firefox and Microsoft Edge. Internet
+                    Explorer is not supported since it is now deprecated by Microsoft in
                     favour of Microsoft Edge.</p>
                 <h2><span class="i18n" data-i18n-id="i18n_international_editions">International Editions</span></h2>
                 <p id="preview_editions" style="margin-bottom : 0px"></p>
                 <p id="preview_mrcm" style="margin-bottom : 0px"></p>
             </div>
-            <p><span class="i18n" data-i18n-id="i18n_home6"><span class="btn-success"><em>Releases</em></span> will allow the selection of SNOMED CT content from the International Edition or other extensions, with specific dates.</span>
+            <p><span class="i18n" data-i18n-id="i18n_home6"><span class="btn-success"><em>Releases</em></span> will
+                    allow the selection of SNOMED CT content from the International Edition or other extensions, with
+                    specific dates.</span>
             </p>
-            <p><span class="i18n" data-i18n-id="i18n_home7"><span class="btn-primary"><em>Perspectives</em></span> are pre-defined browsing layouts for specific purposes. Use the <a href="javascript:void(0);" onclick="switchToResponsiveLayout(404684003, 404684003, 138875005);">responsive perspective</a>                for best results in tablets and phones.</span>
+            <p><span class="i18n" data-i18n-id="i18n_home7"><span class="btn-primary"><em>Perspectives</em></span> are
+                    pre-defined browsing layouts for specific purposes. Use the <a href="javascript:void(0);"
+                        onclick="switchToResponsiveLayout(404684003, 404684003, 138875005);">responsive perspective</a>
+                    for best results in tablets and phones.</span>
             </p>
-            <p><strong><a href="http://snomed.org/snomedtools-privacy" target=_blank>SNOMED International Privacy Policy</a></strong></small>
+            <p><strong><a href="http://snomed.org/snomedtools-privacy" target=_blank>SNOMED International Privacy
+                        Policy</a></strong></small>
             </p>
-            <p> <small><b>&copy; SNOMED International <span class="copyright_year"/></b> v<span>project_version</span><br></small>
+            <p> <small><b>&copy; SNOMED International <span class="copyright_year" /></b>
+                    v<span>project_version</span><br></small>
             </p>
         </div>
 
@@ -2528,15 +2802,25 @@ Please provide any feedback by clicking on the feedback button at the top of the
                         <li id="fh-taxonomies_canvas-li">
                             <a href="#fh-taxonomy_canvas" data-toggle="tab">
                                 <div>
-                                    <span ondrop="dropT(event, 'fh-taxonomy_canvas');$('#fh-tabs a:first').tab('show');markTaxonomyTabAsLoaded();" ondragleave="removeHighlight();" ondragover="allowDrop(event)" class="i18n" data-i18n-id="i18n_taxonomy">Taxonomy</span>
+                                    <span
+                                        ondrop="dropT(event, 'fh-taxonomy_canvas');$('#fh-tabs a:first').tab('show');markTaxonomyTabAsLoaded();"
+                                        ondragleave="removeHighlight();" ondragover="allowDrop(event)" class="i18n"
+                                        data-i18n-id="i18n_taxonomy">Taxonomy</span>
                                 </div>
                             </a>
                         </li>
-                        <li class="active"><a href="#fh-search_canvas" data-toggle="tab"><span class="i18n" data-i18n-id="i18n_search">Search</span></a></li>
-                        <li id="fh-favorites_canvas-li"><a href="#fh-favorites_canvas" data-toggle="tab"><span class="i18n" data-i18n-id="i18n_favorites">Favorites</span></a></li>
-                        <li id="fh-refset_canvas-li"><a href="#fh-refset_canvas" data-toggle="tab" id="fh-refset_canvas-link"><span class="i18n" data-i18n-id="i18n_refset">Refset</span></a></li>
-                        <li id="fh-daily_canvas-li"><a href="#fh-daily_canvas" data-toggle="tab"><span class="i18n" data-i18n-id="i18n_daily_build">Daily Build</span></a></li>
-                        <li id="fh-commnunity_content_canvas-li"><a href="#fh-commnunity_content_canvas" data-toggle="tab"><span class="i18n" data-i18n-id="i18n_community_content">Community Content</span></a></li>
+                        <li class="active"><a href="#fh-search_canvas" data-toggle="tab"><span class="i18n"
+                                    data-i18n-id="i18n_search">Search</span></a></li>
+                        <li id="fh-favorites_canvas-li"><a href="#fh-favorites_canvas" data-toggle="tab"><span
+                                    class="i18n" data-i18n-id="i18n_favorites">Favorites</span></a></li>
+                        <li id="fh-refset_canvas-li"><a href="#fh-refset_canvas" data-toggle="tab"
+                                id="fh-refset_canvas-link"><span class="i18n"
+                                    data-i18n-id="i18n_refset">Refset</span></a></li>
+                        <li id="fh-daily_canvas-li"><a href="#fh-daily_canvas" data-toggle="tab"><span class="i18n"
+                                    data-i18n-id="i18n_daily_build">Daily Build</span></a></li>
+                        <li id="fh-commnunity_content_canvas-li"><a href="#fh-commnunity_content_canvas"
+                                data-toggle="tab"><span class="i18n" data-i18n-id="i18n_community_content">Community
+                                    Content</span></a></li>
                         <!--<li id="fh-query_canvas-li"><a href="#fh-query_canvas" data-toggle="tab"><span class="i18n" data-i18n-id="i18n_constraint">Constraint</span></a></li>-->
                     </ul>
                     <div class="tab-content" id="left-nav-tabs">
@@ -2551,8 +2835,11 @@ Please provide any feedback by clicking on the feedback button at the top of the
                 </div>
                 <div class="a panel panel-default" id="fh-tabs-pane2" style="border-radius: 0px;">
                     <ul class="nav nav-tabs" id="fh-tabs2">
-                        <li class="active"><a href="#fh-cd1_canvas-pane" data-toggle="tab"><span class="i18n" data-i18n-id="i18n_concept_details">Concept Details</span></a></li>
-                        <li id="fh-query_canvas-li"><a href="#fh-query_canvas" data-toggle="tab"><span class="i18n" data-i18n-id="i18n_expression_constraint_queries">Expression Constraint Queries</span></a></li>
+                        <li class="active"><a href="#fh-cd1_canvas-pane" data-toggle="tab"><span class="i18n"
+                                    data-i18n-id="i18n_concept_details">Concept Details</span></a></li>
+                        <li id="fh-query_canvas-li"><a href="#fh-query_canvas" data-toggle="tab"><span class="i18n"
+                                    data-i18n-id="i18n_expression_constraint_queries">Expression Constraint
+                                    Queries</span></a></li>
                     </ul>
                     <div class="tab-content">
                         <div class="tab-pane active" id="fh-cd1_canvas-pane" style="padding: 0px;margin: 0;">
@@ -2566,12 +2853,17 @@ Please provide any feedback by clicking on the feedback button at the top of the
         </div>
         <!-- Responsive Perspective -->
         <div id="responsive-perspective" class="bperspective">
-            <div id="comparing-taxonomies-wrapper3" class="row" style="width:100%; height: 91%; position: absolute;padding: 0px !important;margin: 0 !important;">
+            <div id="comparing-taxonomies-wrapper3" class="row"
+                style="width:100%; height: 91%; position: absolute;padding: 0px !important;margin: 0 !important;">
                 <div class="row">
-                    <div id="rp-taxonomy_canvas" class="col-sm-6" style="height: 500px;padding: 0px;margin: 0;border: 1px solid gainsboro;"></div>
-                    <div id="rp-cd1_canvas" class="col-sm-6" style="height: 500px;padding: 0px;margin: 0;border: 1px solid gainsboro;"></div>
-                    <div id="rp-search_canvas" class="col-sm-6" style="height: 500px;padding: 0px;margin: 0;border: 1px solid gainsboro;"></div>
-                    <div id="rp-cd2_canvas" class="col-sm-6" style="height: 500px;padding: 0px;margin: 0;border: 1px solid gainsboro;"></div>
+                    <div id="rp-taxonomy_canvas" class="col-sm-6"
+                        style="height: 500px;padding: 0px;margin: 0;border: 1px solid gainsboro;"></div>
+                    <div id="rp-cd1_canvas" class="col-sm-6"
+                        style="height: 500px;padding: 0px;margin: 0;border: 1px solid gainsboro;"></div>
+                    <div id="rp-search_canvas" class="col-sm-6"
+                        style="height: 500px;padding: 0px;margin: 0;border: 1px solid gainsboro;"></div>
+                    <div id="rp-cd2_canvas" class="col-sm-6"
+                        style="height: 500px;padding: 0px;margin: 0;border: 1px solid gainsboro;"></div>
                 </div>
             </div>
         </div>
@@ -2581,10 +2873,12 @@ Please provide any feedback by clicking on the feedback button at the top of the
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title"><span class="i18n" data-i18n-id="i18n_licence_agreement">SNOMED International SNOMED CT Browser License Agreement</span></h4>
+                    <h4 class="modal-title"><span class="i18n" data-i18n-id="i18n_licence_agreement">SNOMED
+                            International SNOMED CT Browser License Agreement</span></h4>
                 </div>
                 <div class="modal-body">
-                    <p><span class="i18n" data-i18n-id="i18n_licence_agreement_1">In order to use the SNOMED International SNOMED CT Browser, please accept the following license agreement</span>:</p>
+                    <p><span class="i18n" data-i18n-id="i18n_licence_agreement_1">In order to use the SNOMED
+                            International SNOMED CT Browser, please accept the following license agreement</span>:</p>
                     <div style="height: 300px; overflow: auto; margin: 20px; border: 1px solid; padding: 10px;">
                         <p><span class="i18n" data-i18n-id="i18n_licence_agreement_2"><strong>SNOMED International SNOMED CT Browser</strong> includes SNOMED Clinical Terms® (SNOMED CT®) which is used by permission of SNOMED International. All rights reserved. SNOMED CT® was originally created by the College of American Pathologists.</span>
                             <span class="i18n" data-i18n-id="i18n_licence_agreement_3">“SNOMED”, “SNOMED CT” and “SNOMED Clinical Terms” are registered trademarks of the SNOMED International (<a href="http://www.snomed.org">www.snomed.org</a>).</span></p>
@@ -2604,15 +2898,20 @@ Please provide any feedback by clicking on the feedback button at the top of the
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <a href="http://www.snomed.org" class="btn btn-danger"><span class="i18n" data-i18n-id="i18n_reject">Reject</span></a>
-                    <button id="accept-license-button-modal" type="button" class="btn btn-success" data-dismiss="modal"><span class="i18n" data-i18n-id="i18n_accept">Accept</span></button>
+                    <a href="http://www.snomed.org" class="btn btn-danger"><span class="i18n"
+                            data-i18n-id="i18n_reject">Reject</span></a>
+                    <button id="accept-license-button-modal" type="button" class="btn btn-success"
+                        data-dismiss="modal"><span class="i18n" data-i18n-id="i18n_accept">Accept</span></button>
                     <div class="btn-group dropup pull-left">
                         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                                <span id="nav-selected-flag-modal"></span> <span class="caret"></span>
-                            </button>
+                            <span id="nav-selected-flag-modal"></span> <span class="caret"></span>
+                        </button>
                         <ul class="dropdown-menu" role="menu">
                             <li class="pull-left">
-                                <a href="javascript:void(0);" onclick="switchLanguage('en', 'img/flags/us.png', true);"><img src="img/flags/us.png" /> English</a>
+                                <a href="javascript:void(0);" onclick="switchLanguage('en', 'us', true);">
+                                    <div class="phoca-flagbox" style="width:16px;height:11px"><span
+                                            class="phoca-flag us" style="width:100%;height:100%"></span></div> English
+                                </a>
                             </li>
                             <li class="pull-left">
                                 <a href="javascript:void(0);" onclick="switchLanguage('fr', 'img/flags/fr.png', true);"><img src="img/flags/fr.png" /> Français</a>
@@ -2621,10 +2920,16 @@ Please provide any feedback by clicking on the feedback button at the top of the
                                 <a href="javascript:void(0);" onclick="switchLanguage('es', 'img/flags/es.png', true);"><img src="img/flags/es.png" /> Español</a>
                             </li>
                             <li class="pull-left">
-                                <a href="javascript:void(0);" onclick="switchLanguage('da', 'img/flags/dk.png', true);"><img src="img/flags/dk.png" /> Dansk</a>
+                                <a href="javascript:void(0);" onclick="switchLanguage('da', 'dk', true);">
+                                    <div class="phoca-flagbox" style="width:16px;height:11px"><span
+                                            class="phoca-flag dk" style="width:100%;height:100%"></span></div> Dansk
+                                </a>
                             </li>
                             <li class="pull-left">
-                                <a href="javascript:void(0);" onclick="switchLanguage('pt', 'img/flags/pt.png', true);"><img src="img/flags/pt.png" /> Português</a>
+                                <a href="javascript:void(0);" onclick="switchLanguage('pt', 'pt', true);">
+                                    <div class="phoca-flagbox" style="width:16px;height:11px"><span
+                                            class="phoca-flag pt" style="width:100%;height:100%"></span></div> Português
+                                </a>
                             </li>
                             <li class="pull-left">
                                 <a href="javascript:void(0);" onclick="switchLanguage('se', 'img/flags/se.png', true);"><img src="img/flags/se.png" /> Svenska</a>
@@ -2698,10 +3003,11 @@ Please provide any feedback by clicking on the feedback button at the top of the
         ga('set', 'anonymizeIP', true);
     </script>
 
+    <script type="text/javascript" src="external-libs/iubenda-cookies.js"></script>
     <script>
         // History capture of the manual back and forward buttons
         manualStateChange = true;
-        History.Adapter.bind(window, 'statechange', function() { // Note: We are using statechange instead of popstate
+        History.Adapter.bind(window, 'statechange', function () { // Note: We are using statechange instead of popstate
             if (manualStateChange == true) {
                 // BACK BUTTON WAS PRESSED
                 var State = History.getState(); // Note: We are using History.getState() instead of event.state
