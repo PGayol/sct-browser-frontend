@@ -43,7 +43,7 @@ module.exports = function(grunt) {
                     'external-libs/postal.min.js',
                     'external-libs/bootstrap-tour.min.js',
                     'external-libs/jquery.i18n.properties-min-1.0.9.js',
-                    'external-libs/handlebars-v1.3.0.min.js',
+                    'external-libs/handlebars.runtime.min-v4.7.8.js',
                     'external-libs/bootstrap.min.js',
                     'external-libs/jquery.ui.touch-punch.min.js',
                     'external-libs/excellentexport.min.js',
@@ -54,7 +54,10 @@ module.exports = function(grunt) {
                     'external-libs/canvg.min.js',
                     'external-libs/bootstrap-multiselect.js',
                     'external-libs/jquery.history.js',
-                    'external-libs/ZeroClipboard.js'
+                    'external-libs/ZeroClipboard.js',
+                    'external-libs/datatables.min.js',
+                    'external-libs/jquery.contextMenu.js',
+                    'external-libs/jquery.ui.position.js'
                 ],
                 dest: 'snomed-interaction-components/dist/js/external.js'
             },
@@ -80,6 +83,8 @@ module.exports = function(grunt) {
                     "css/popover-extra-placements.css",
                     "css/animate.css",
                     "css/bootstrap-multiselect.css",
+                    "css/datatables.min.css",
+                    "css/jquery.contextMenu.css",
                     'snomed-interaction-components/dist/css/<%= pkg.name %>.css'
                 ],
                 dest: 'css/external.css'
@@ -126,6 +131,10 @@ module.exports = function(grunt) {
                 {                
                     src: 'snomed-interaction-components/dist/css/<%= pkg.name %>.min.css',
                     dest: 'css//<%= pkg.name %>.min.css',
+                },
+                {
+                    src: 'node_modules/snomed-ecl-builder/output/*',
+                    dest: 'internal-libs/'
                 }]
             }
             

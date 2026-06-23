@@ -127,7 +127,7 @@ function taxonomyPanel(divElement, conceptId, options) {
         $("#" + panel.divElement.id + "-historyButton").click(function(event) {
             $("#" + panel.divElement.id + "-historyButton").popover({
                 trigger: 'manual',
-                placement: 'bottomRight',
+                placement: function(context, src) {  $(context).addClass(panel.divElement.id + '-historyButton-popover'); return 'bottomRight'; },
                 html: true,
                 content: function() {
                     historyHtml = '<div style="height:100px;overflow:auto;">';
@@ -138,6 +138,20 @@ function taxonomyPanel(divElement, conceptId, options) {
                     var reversedHistory = panel.history.slice(0);
                     reversedHistory.reverse();
                     //console.log(JSON.stringify(reversedHistory));
+                    var second_text = jQuery.i18n.prop('i18n_second');
+                    var seconds_text = jQuery.i18n.prop('i18n_seconds');
+                    var minute_text = jQuery.i18n.prop('i18n_minute');
+                    var minutes_text = jQuery.i18n.prop('i18n_minutes');
+                    var hour_text = jQuery.i18n.prop('i18n_hour');
+                    var hours_text = jQuery.i18n.prop('i18n_hours');
+                    var ago_text = jQuery.i18n.prop('i18n_ago');
+                    var second_html = "<span class='i18n' data-i18n-id='i18n_second'>"+second_text+"</span>";
+                    var seconds_html = "<span class='i18n' data-i18n-id='i18n_seconds'>"+seconds_text+"</span>";
+                    var minute_html = "<span class='i18n' data-i18n-id='i18n_minute'>"+minute_text+"</span>";
+                    var minutes_html = "<span class='i18n' data-i18n-id='i18n_minutes'>"+minutes_text+"</span>";
+                    var hour_html = "<span class='i18n' data-i18n-id='i18n_hour'>"+hour_text+"</span>";
+                    var hours_html = "<span class='i18n' data-i18n-id='i18n_hours'>"+hours_text+"</span>";
+                    var ago_html = "<span class='i18n' data-i18n-id='i18n_ago'>"+ago_text+"</span>";
                     $.each(reversedHistory, function(i, field) {
                         var d = new Date();
                         var curTime = d.getTime();
@@ -145,21 +159,21 @@ function taxonomyPanel(divElement, conceptId, options) {
                         var agoString = "";
                         if (ago < (1000 * 60)) {
                             if (Math.round((ago / 1000)) == 1) {
-                                agoString = Math.round((ago / 1000)) + ' second ago';
+                                agoString = Math.round((ago / 1000)) + ' '+ second_html + ' ' + ago_html;
                             } else {
-                                agoString = Math.round((ago / 1000)) + ' seconds ago';
+                                agoString = Math.round((ago / 1000)) + ' '+ seconds_html + ' ' + ago_html;
                             }
                         } else if (ago < (1000 * 60 * 60)) {
                             if (Math.round((ago / 1000) / 60) == 1) {
-                                agoString = Math.round((ago / 1000) / 60) + ' minute ago';
+                                agoString = Math.round((ago / 1000) / 60) + ' '+ minute_html + ' ' + ago_html;
                             } else {
-                                agoString = Math.round((ago / 1000) / 60) + ' minutes ago';
+                                agoString = Math.round((ago / 1000) / 60) + ' '+ minutes_html + ' ' + ago_html;
                             }
                         } else if (ago < (1000 * 60 * 60 * 60)) {
                             if (Math.round(((ago / 1000) / 60) / 60) == 1) {
-                                agoString = Math.round(((ago / 1000) / 60) / 60) + ' hour ago';
+                                agoString = Math.round(((ago / 1000) / 60) / 60) + ' '+ hour_html + ' ' + ago_html;
                             } else {
-                                agoString = Math.round(((ago / 1000) / 60) / 60) + ' hours ago';
+                                agoString = Math.round(((ago / 1000) / 60) / 60) + ' '+ hours_html + ' ' + ago_html;
                             }
                         }
                         historyHtml = historyHtml + '<tr><td><a href="javascript:void(0);" onclick="historyInTaxPanel(\'' + panel.divElement.id + '\',\'' + field.conceptId + '\');">' + field.term + '</a>';
@@ -308,7 +322,6 @@ function taxonomyPanel(divElement, conceptId, options) {
     }
 
     this.setupParents = function(parents, focusConcept) {
-        console.log(focusConcept);
         var lastParent;
         $.each(parents, function(i, parent) {
             lastParent = parent;
@@ -370,6 +383,9 @@ function taxonomyPanel(divElement, conceptId, options) {
                 var descendantCount = $(event.target).attr('data-descendants')
                 var selectedLabel = $(event.target).attr('data-term');
                 var definitionStatus = $(event.target).attr('data-definition-status');
+                var fsn = {'term' : $(event.target).attr('data-fsn')};
+                var pt = {'term': $(event.target).attr('data-preferred-term')};                
+
                 panel.history.push({ term: selectedLabel, conceptId: selectedId, time: time });
                 panel.default.conceptId = selectedId;
                 var branch = options.edition;
@@ -377,13 +393,11 @@ function taxonomyPanel(divElement, conceptId, options) {
                     branch = branch + "/" + options.release;
                 };
                 if (typeof selectedId != "undefined") {
-                    if(!options.serverUrl.includes('snowowl')){
-                       $.ajaxSetup({
-                          headers : {
-                            'Accept-Language': panel.options.acceptLanguageValue
-                          }
-                        });
-                    };
+                    $.ajaxSetup({
+                        headers : {
+                          'Accept-Language': panel.options.acceptLanguageValue
+                        }
+                    });
                     $.getJSON(options.serverUrl + "/browser/" + branch + "/concepts/" + selectedId + "/parents?form=" + panel.options.selectedView + "&includeDescendantCount=" + panel.options.descendantsCount, function(result) {
                         result.forEach(function(item) {
                             if(panel.options.showPreferredTerm){
@@ -401,7 +415,7 @@ function taxonomyPanel(divElement, conceptId, options) {
                             $("#" + panel.divElement.id + "-selectedConceptSection").show();
                         }
 
-                        panel.setupParents(result, { conceptId: selectedId, defaultTerm: selectedLabel, definitionStatus: definitionStatus, module: selectedModule, descendantCount: descendantCount});
+                        panel.setupParents(result, { conceptId: selectedId, defaultTerm: selectedLabel, definitionStatus: definitionStatus, module: selectedModule, descendantCount: descendantCount, fsn: fsn, pt: pt});
                     }).fail(function() {});
                 }
             }
@@ -460,13 +474,11 @@ function taxonomyPanel(divElement, conceptId, options) {
         if(options.release.length > 0 && options.release !== 'None'){
             branch = branch + "/" + options.release;
         };
-        if(!options.serverUrl.includes('snowowl')){
-           $.ajaxSetup({
-              headers : {
-                'Accept-Language': panel.options.acceptLanguageValue
-              }
-            });
-        };
+        $.ajaxSetup({
+            headers : {
+              'Accept-Language': panel.options.acceptLanguageValue
+            }
+        });
         $.getJSON(options.serverUrl + "/browser/" + branch + "/concepts/" + conceptId + "/children?form=" + panel.options.selectedView + "&includeDescendantCount=" + panel.options.descendantsCount, function(result) {}).done(function(result) {
             result.forEach(function(item) {
                 if(panel.options.showPreferredTerm){
@@ -583,13 +595,11 @@ function taxonomyPanel(divElement, conceptId, options) {
         if(options.release.length > 0 && options.release !== 'None'){
             branch = branch + "/" + options.release;
         };
-        if(!options.serverUrl.includes('snowowl')){
-           $.ajaxSetup({
-              headers : {
-                'Accept-Language': panel.options.acceptLanguageValue
-              }
-            });
-        };
+        $.ajaxSetup({
+            headers : {
+              'Accept-Language': panel.options.acceptLanguageValue
+            }
+        });
         $.getJSON(options.serverUrl + "/browser/" + branch + "/concepts/" + conceptId + "/parents?form=" + panel.options.selectedView + "&includeDescendantCount=" + panel.options.descendantsCount, function(parents) {
         }).done(function(parents) {
             if (parents.length > 0) {
@@ -605,9 +615,9 @@ function taxonomyPanel(divElement, conceptId, options) {
                     }
                     parentLiHtml = parentLiHtml + " treeButton'  id='" + panel.divElement.id + "-treeicon-" + parent.conceptId + "'></i></button>";
                     if (parent.definitionStatus == "PRIMITIVE") {
-                        parentLiHtml = parentLiHtml + '<span class="badge alert-warning" data-concept-id="' + parent.conceptId + '" data-term="' + parent.fsn.term + '" draggable="true" ondragstart="drag(event)" class="treeLabel selectable-row" id="' + panel.divElement.id + '-treenode-' + parent.conceptId + '">&nbsp;&nbsp;</span>&nbsp;&nbsp;';
+                        parentLiHtml = parentLiHtml + '<span class="badge alert-warning context-menu" data-concept-id="' + parent.conceptId + '" data-fsn="' + parent.fsn.term + '" data-preferred-term="' + parent.pt.term + '" data-term="' + parent.fsn.term + '" draggable="true" ondragstart="drag(event)" class="treeLabel selectable-row" id="' + panel.divElement.id + '-treenode-' + parent.conceptId + '">&nbsp;&nbsp;</span>&nbsp;&nbsp;';
                     } else {
-                        parentLiHtml = parentLiHtml + '<span class="badge alert-warning" data-concept-id="' + parent.conceptId + '" data-term="' + parent.fsn.term + '" draggable="true" ondragstart="drag(event)" class="treeLabel selectable-row" id="' + panel.divElement.id + '-treenode-' + parent.conceptId + '">&equiv;</span>&nbsp;&nbsp;';
+                        parentLiHtml = parentLiHtml + '<span class="badge alert-warning context-menu" data-concept-id="' + parent.conceptId + '" data-fsn="' + parent.fsn.term + '" data-preferred-term="' + parent.pt.term + '" data-term="' + parent.fsn.term + '" draggable="true" ondragstart="drag(event)" class="treeLabel selectable-row" id="' + panel.divElement.id + '-treenode-' + parent.conceptId + '">&equiv;</span>&nbsp;&nbsp;';
                     }
                     if (countryIcons[parent.module]) {
                         parentLiHtml = parentLiHtml + "<div class='phoca-flagbox' style='width:33px;height:33px'><span class='phoca-flag " + countryIcons[parent.module] + "'></span></div> ";
@@ -619,7 +629,7 @@ function taxonomyPanel(divElement, conceptId, options) {
                     else{
                         defaultTerm = parent.fsn.term;
                     }
-                    parentLiHtml = parentLiHtml + '<a href="javascript:void(0);" style="color: inherit;text-decoration: inherit;"><span class="treeLabel selectable-row" data-concept-id="' + parent.conceptId + '" data-term="' + parent.fsn.term + '"> ' + defaultTerm + '</span></a>';
+                    parentLiHtml = parentLiHtml + '<a href="javascript:void(0);" style="color: inherit;text-decoration: inherit;"><span class="treeLabel selectable-row" data-concept-id="' + parent.conceptId + '" data-term="' + parent.fsn.term + '" data-preferred-term="' + parent.pt.term + '" draggable="true" ondragstart="drag(event)"> ' + defaultTerm + '</span></a>';
                     parentLiHtml = parentLiHtml + "</li>";
                     parentsStrs.push(parentLiHtml);
                     if (firstParent == "empty") {
@@ -695,13 +705,11 @@ function taxonomyPanel(divElement, conceptId, options) {
         if(options.release.length > 0 && options.release !== 'None'){
             branch = branch + "/" + options.release;
         };
-        if(!options.serverUrl.includes('snowowl')){
-           $.ajaxSetup({
-              headers : {
-                'Accept-Language': panel.options.acceptLanguageValue
-              }
-            });
-        };
+        $.ajaxSetup({
+            headers : {
+              'Accept-Language': panel.options.acceptLanguageValue
+            }
+        });
         $.getJSON(options.serverUrl + "/browser/" + branch + "/concepts/" + conceptId + "/parents?form=" + panel.options.selectedView + "&includeDescendantCount=" + panel.options.descendantsCount, function(result) {
             $.each(result, function(i, item) {
                 if (typeof item.defaultTerm == "undefined") {
@@ -715,17 +723,12 @@ function taxonomyPanel(divElement, conceptId, options) {
             });
         }).done(function(result) {            
             if (typeof term == "undefined" || typeof definitionStatus == "undefined" || term == null || definitionStatus == null) {
-                if(!options.serverUrl.includes('snowowl')){
-                   $.ajaxSetup({
-                      headers : {
-                        'Accept-Language': panel.options.acceptLanguageValue
-                      }
-                    });
-                };
-                var urlArgs = '?descendantCountForm=' + panel.options.selectedView;
-                if(options.serverUrl.includes('snowowl')){
-                    urlArgs = urlArgs + '&expand=fsn()';
-                }
+                $.ajaxSetup({
+                    headers : {
+                      'Accept-Language': panel.options.acceptLanguageValue
+                    }
+                });
+                var urlArgs = '?descendantCountForm=' + panel.options.selectedView;                
                 $.getJSON(options.serverUrl + "/browser/" + branch + "/concepts/" + conceptId + urlArgs, function(res) {
                     if(panel.options.showPreferredTerm){
                         res.defaultTerm = res.pt.term;
@@ -741,10 +744,10 @@ function taxonomyPanel(divElement, conceptId, options) {
                         $("#" + panel.divElement.id + "-selectedConceptSection").show();
                     }
                     
-                    panel.setupParents(result, { conceptId: conceptId, defaultTerm: res.defaultTerm, definitionStatus: res.definitionStatus, module: module, descendantCount: res.descendantCount });
+                    panel.setupParents(result, { conceptId: conceptId, defaultTerm: res.defaultTerm, definitionStatus: res.definitionStatus, module: module, descendantCount: res.descendantCount, fsn: res.fsn, pt: res.pt });
                 });
             } else {
-                panel.setupParents(result, { conceptId: conceptId, defaultTerm: term, definitionStatus: definitionStatus, module: module, descendantCount: descendantCount });
+                panel.setupParents(result, { conceptId: conceptId, defaultTerm: term, definitionStatus: definitionStatus, module: module, descendantCount: descendantCount, fsn: res.fsn, pt: res.pt });
             }
         }).fail(function() {
             $("#" + panel.divElement.id + "-panelBody").html("<div class='alert alert-danger'><span class='i18n' data-i18n-id='i18n_ajax_failed'><strong>Error</strong> while retrieving data from server...</span></div>");
@@ -763,7 +766,9 @@ function taxonomyPanel(divElement, conceptId, options) {
         languageFilter.push(usFSN);
         languageFilter.push(usPT);
         languageRefsets.forEach(function(languageRefset) {
-            if (languageRefset.conceptId !== '900000000000509007' && languageRefset.conceptId !== '900000000000508004') {
+            if (languageRefset.conceptId !== '900000000000509007' 
+                && languageRefset.conceptId !== '900000000000508004'
+                && panel.options.languageNameOfLangRefset.hasOwnProperty(languageRefset.conceptId)) {
                 var dialect = {id: languageRefset.conceptId, label: 'PT in ' + panel.options.languageNameOfLangRefset[languageRefset.conceptId], dialectId: languageRefset.conceptId};
                 languageFilter.push(dialect);
             }            
@@ -798,7 +803,7 @@ function taxonomyPanel(divElement, conceptId, options) {
     }
 
     panel.getAcceptLanguage = function(dialectId) {
-        if (dialectId !== "900000000000509007") {
+        if (dialectId !== "900000000000509007" && panel.options.languageNameOfLangRefset.hasOwnProperty(dialectId)) {
             if (panel.options.languageNameOfLangRefset[dialectId].includes('-')) {
                 var strArray = panel.options.languageNameOfLangRefset[dialectId].split('-');
                 return strArray[0].toLowerCase() + '-' + strArray[1].toUpperCase() + '-x-' + dialectId + ';q=0.8,en-US;q=0.5';

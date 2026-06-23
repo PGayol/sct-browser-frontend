@@ -12,14 +12,14 @@
                     {{else}}
                         {{firstMatch.defaultTerm}}
                     {{/if_undefined}}
-                    " data-def-status="{{firstMatch.definitionStatus}}" style="color: inherit;text-decoration: inherit;"><span class="badge alert-warning">&nbsp;&nbsp;</span></a>&nbsp;&nbsp;
+                    " data-def-status="{{firstMatch.definitionStatus}}" style="color: inherit;text-decoration: inherit;"><span class="badge alert-warning context-menu" data-concept-id="{{firstMatch.conceptId}}" data-fsn="{{firstMatch.fsn.term}}" data-preferred-term="{{firstMatch.pt.term}}">&nbsp;&nbsp;</span></a>&nbsp;&nbsp;
                 {{else}}
                     <a href="javascript:void(0);" draggable = "true" ondragstart="drag(event, '{{divElementId}}')" data-module="{{firstMatch.moduleId}}" data-concept-id="{{firstMatch.conceptId}}" data-term="{{#if_undefined firstMatch.fsn.term}}
                         {{firstMatch.fsn}}
                     {{else}}
                         {{firstMatch.defaultTerm}}
                     {{/if_undefined}}
-                    " data-def-status="{{firstMatch.definitionStatus}}" style="color: inherit;text-decoration: inherit;"><span class="badge alert-warning" >&equiv;</span></a>&nbsp;&nbsp;
+                    " data-def-status="{{firstMatch.definitionStatus}}" style="color: inherit;text-decoration: inherit;"><span class="badge alert-warning context-menu" data-concept-id="{{firstMatch.conceptId}}" data-fsn="{{firstMatch.fsn.term}}" data-preferred-term="{{firstMatch.pt.term}}">&equiv;</span></a>&nbsp;&nbsp;
                 {{/if_eq}}
 
                 <span ondrop="dropC(event, '{{divElementId}}', '{{firstMatch.historyEffective}}')" ondragleave="removeHighlight();" ondragover="allowDrop(event)">
@@ -30,10 +30,14 @@
                 {{/if_undefined}}
                 </span>
             </h4>
-            <br>SCTID: {{firstMatch.conceptId}}<span>,</span>
-
+            <br>
+            SCTID: {{firstMatch.conceptId}}
+            {{#each firstMatch.alternateIdentifiers}}{{#if active}}{{#if identifierScheme.pt.term}}<div style="background-color: rgb(66, 139, 202);color: #fff;
+            padding-left: 4px; padding-right: 4px; padding-top: 2px; padding-bottom: 2px;border: 1px solid darkgrey; border-radius: 4px; width: fit-content; display: inline; margin-left: 10px;">{{identifierScheme.pt.term}}: {{alternateIdentifier}}</div>{{/if}}{{/if}}{{/each}}
+             <br>
+             <div style="padding-top: 10px">
             {{#if_eq firstMatch.definitionStatus "PRIMITIVE"}}
-                <span class='i18n' data-i18n-id='i18n_primitive'>PRIMITIVE</span><span>,</span>
+                <span class='i18n' data-i18n-id='i18n_primitive'>Primitive</span><span>,</span>
             {{else}}
                 <span class='i18n' data-i18n-id='i18n_fully_defined'>Defined</span><span>,</span>
             {{/if_eq}}
@@ -45,6 +49,7 @@
             {{/if_eq}}
 
             <span id="{{divElementId}}-descendantInfor"><span class='i18n' data-i18n-id='i18n_descendants_count'>{{i18n 'i18n_descendants_count' 'Descendants Count'}}</span>: <span id="{{divElementId}}-descendantCount"></span> <span class='i18n' data-i18n-id='i18n_concepts'>{{i18n 'i18n_concepts' 'concepts'}}</span>.</span>            
+            </div>
         </td>
         <td>
             <button type="button" class="btn btn-link unobtrusive-icon more-fields-button pull-right" data-container="body" data-toggle="popover" data-placement="left" data-content="
@@ -57,22 +62,23 @@
                         <i class="glyphicon glyphicon-export pull-right" id="{{divElementId}}-copy-icon-details"></i>
                     </button>
                     <ul class="dropdown-menu small pull-right" role="menu" aria-labelledby="dropdownMenu1-details">
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" id="{{divElementId}}-copy-sctid-details" class="clip-btn" data-clipboard-text="{{firstMatch.conceptId}}">Copy ConceptId</a></li>
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" id="{{divElementId}}-copy-term-details" class="clip-btn" data-clipboard-text="{{firstMatch.defaultTerm}}">Copy Term</a></li>
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" id="{{divElementId}}-copy-sctid-term-details" class="clip-btn" data-clipboard-text="{{firstMatch.conceptId}} |{{firstMatch.defaultTerm}}|">Copy Term and ConceptId</a></li>
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" id="{{divElementId}}-copy-link-details" class="clip-btn" data-clipboard-text="{{link}}">Copy Link to share</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" id="{{divElementId}}-copy-sctid-details" class="clip-btn" data-clipboard-text="{{firstMatch.conceptId}}">Copy Concept ID</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" id="{{divElementId}}-copy-fsn-details" class="clip-btn" data-clipboard-text="{{firstMatch.fsn.term}}">Copy FSN</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" id="{{divElementId}}-copy-sctid-fsn-details" class="clip-btn" data-clipboard-text="{{firstMatch.conceptId}} |{{firstMatch.fsn.term}}|">Copy FSN and Concept ID</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" id="{{divElementId}}-copy-sctid-term-details" class="clip-btn" data-clipboard-text="{{firstMatch.conceptId}} |{{firstMatch.pt.term}}|">Copy PT and Concept ID</a></li>                        
+                        {{#if options.hideConceptShareLink}}
+                        {{else}}
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" id="{{divElementId}}-copy-link-details" class="clip-btn" data-clipboard-text="{{link}}">Copy link to share</a></li>
+                        {{/if}}
                     </ul>
                 </div>
             </span>
-            {{#if showIssueCollector}}
+            {{#if (or showIssueCollector showFeedbackButton)}}
                 <span class="pull-right">
-                    <div class="dropdown">
-                        <button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenu1-details" data-toggle="dropdown" aria-expanded="true">
-                            <i class="glyphicon glyphicon-plus-sign pull-right" id="{{divElementId}}-addsyn-icon-details"></i>
+                    <div>
+                        <button class="btn btn-success" style="margin-left:15px;" type="button" id="{{divElementId}}-addsyn-sctid-details"aria-expanded="true">
+                            <span data-i18n-id="i18n_concept_feedback" class="i18n">{{i18n "i18n_concept_feedback" "Concept Feedback"}}</span>
                         </button>
-                        <ul class="dropdown-menu small pull-right" role="menu" aria-labelledby="dropdownMenu2-details">
-                            <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" id="{{divElementId}}-addsyn-sctid-details">{{issueCollectorButtonText}}</a></li>
-                        </ul>
                     </div>
                 </span>
             {{/if}}
@@ -80,7 +86,7 @@
                     <!--<form><input class='form-control' id='share-field-{{divElementId}}' value='{{dataContentValue}}?perspective=full&conceptId1={{firstMatch.conceptId}}&edition={{edition}}&release={{release}}&server={{server}}&langRefset={{langRefset}}'></form><br>Copy the concept link (e.g. CTRL-C) to save and share a reference to this concept.-->
                     <!--" data-html="true"><i class="glyphicon glyphicon-share-alt"></i></button>-->
             <span class="pull-right">
-               <div class="phoca-flagbox" style="width:40px;height:40px">
+               <div class="phoca-flagbox" style="width:30px;height:30px">
                    <span class="phoca-flag {{countryIcon firstMatch.moduleId}}"></span>
                </div>
             </span>
