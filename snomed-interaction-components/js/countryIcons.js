@@ -57,3 +57,10 @@ countryIcons = {
 Handlebars.registerHelper('countryIcon', function(moduleId) {
     return countryIcons[moduleId];
 });
+
+Handlebars.registerHelper('hasCountryIcon', function(moduleId, opts) {
+    if (countryIcons[moduleId])
+        return opts.fn(this);
+    else
+        return opts.inverse(this);
+});
