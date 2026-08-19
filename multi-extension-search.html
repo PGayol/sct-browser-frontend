@@ -9,40 +9,17 @@
     <meta name="description" content="SNOMED International SNOMED CT Browser">
     <meta name="author" content="SNOMED International">
     
-    <script src="/browser/external-libs/jquery-3.3.1.min.js" type="text/javascript"></script>
-    <script src="/browser/external-libs/jquery-ui-1.10.4.custom.min.js" type="text/javascript"></script>
-    <script src="/browser/external-libs/base64.js" type="text/javascript"></script>
-    <script src="/browser/external-libs/jquery.svg.js" type="text/javascript"></script>
-    <script src="/browser/external-libs/jquery.splitter-0.14.0.js" type="text/javascript"></script>
-    <script src="/browser/external-libs/conduit.min.js" type="text/javascript"></script>
-    <script src="/browser/external-libs/lodash.js" type="text/javascript"></script>
-    <script src="/browser/external-libs/postal.min.js" type="text/javascript"></script>
-    <script src="/browser/external-libs/bootstrap-tour.min.js"></script>
-    <script src="/browser/external-libs/jquery.i18n.properties-min-1.0.9.js"></script>
-    <script src="/browser/external-libs/handlebars-v1.3.0.min.js"></script>
-    <script src="/browser/external-libs/bootstrap.min.js" type="text/javascript"></script>
-    <script src="/browser/external-libs/jquery.ui.touch-punch.min.js"></script>
-    <script src="/browser/external-libs/excellentexport.min.js"></script>
-    <script src="/browser/external-libs/notify.js"></script>
-    <script src="/browser/external-libs/clipboard.min.js"></script>
-    <script src="/browser/external-libs/popover-extra-placements.js" type="text/javascript"></script>
-    <script src="/browser/external-libs/canvg.min.js" type="text/javascript"></script>
-    <script src="/browser/external-libs/canvas2image.js" type="text/javascript"></script>
+    <script src="internal-libs/snomed-interaction-components.min.js?version=3.41.0-SNAPSHOT-${BUILD_NUMBER}"></script>
+    <script type="text/javascript" src="internal-libs/node_modules/snomed-ecl-builder/output/ecl-builder.js"></script>
 
-    <link rel="stylesheet" type="text/css" href="/browser/css/bootstrap-theme.min.css">
-    <link rel="stylesheet" type="text/css" href="/browser/css/jquery.splitter.css">
-    <link rel="stylesheet" type="text/css" href="/browser/css/jquery-ui-1.10.4.custom.min.css">
-    <link rel="stylesheet" type="text/css" href="/browser/css/bootstrap.min.base.12.css">
-    <link rel="stylesheet" type="text/css" href="/browser/css/bootstrap-tour.css">
-    <link rel="stylesheet" type="text/css" href="/browser/css/popover-extra-placements.css">
-    <link rel="stylesheet" type="text/css" href="/browser/css/animate.css">
-    <link rel="stylesheet" type="text/css" href="/browser/css/bootstrap-multiselect.css">
-    <link rel="stylesheet" type="text/css" href="/browser/css/snomed-interaction-components.min.css?version=build_version">
+    <link rel="stylesheet" type="text/css" href="css/external.css">
+    
+    <style>
+        .modal.fade .modal-dialog {
+            margin-top: 60px;
+        }
+    </style>
 
-    <script src="/browser/internal-libs/snomed-interaction-components.min.js?version=build_version"></script>    
-
-    <script src="/browser/external-libs/jquery.history.js"></script>
-    <script src="/browser/external-libs/ZeroClipboard.js"></script> 
     <script>
         function changeFavicon(iconPrefix) {
           var link;
@@ -142,37 +119,13 @@
             searchLang: "english",
             diagrammingMarkupEnabled: false,           
             highlightByEffectiveTime: "false",
+            publicBrowser: false,
 
             /* New setting for multi Extenstion search */
             multiExtensionSearch: true,
             hideConceptShareLink: true,
             disableHistoryStateChange: true
         };
-
-        options.languageNameOfLangRefset = {
-            "20581000087109": "fr-CA",
-            "19491000087109": "en-CA",
-            "900000000000508004": "GB",
-            "900000000000509007": "US",
-            "450828004": "ES",
-            "5641000179103": "ES",
-            "554461000005103": "DA",
-            "46011000052107": "SV",
-            "32570271000036106": "AU",
-            "11000146104": "NL",
-            "31000146106": "NL",
-            "31000172101": "NL",
-            "15551000146102": "NL-PF",
-            "61000202103": "NO",
-            "21000172104": "FR",
-            "21000220103": "IE",
-            "71000181105": "ET",
-            "281000210109": "NZ-PF",
-            "271000210107": "NZ",
-            "722128001": "ZH",
-            "291000210106": "MI",
-            "21000241105": "FR"
-        };                
 
         options.updateReleaseSwitcher = function(branch, conceptId) {
             options.edition = branch;
@@ -182,6 +135,9 @@
                 let release = options.releases.items[i];
                 if (typeof release.latestVersion !== "undefined" && (release.latestVersion.branchPath === options.edition || release.branchPath === options.edition)) {
                     $("#editionLabel").html(release.name + " " + release.latestVersion.version);
+                    if (options.multiExtensionSearch) {
+                        options.edition = release.latestVersion.branchPath;
+                    }
                     break;
                 }                                       
             }            
@@ -192,6 +148,10 @@
         };
 
         function determineServer() {
+            if (window.location.hostname.includes('browser')) {
+                options.publicBrowser = true;
+            }
+
             var selectedLanguageAndFlag = getSelectedLanguageAndFlag(options.defaultLanguage);
             switchLanguage(selectedLanguageAndFlag.selectedLanguage, selectedLanguageAndFlag.selectedFlag, false);            
 
@@ -209,13 +169,94 @@
                 });
 
                 return dfd.promise();
-            };            
+            };
             
-            $.when(getCodeSystems()).then(function() {
+            var getConfig = function() {
+                var dfd = $.Deferred();
+
+                $.ajax({
+                    url:        'config.json',
+                    async:      false,
+                    cache:		false,
+                    contentType:'application/json; charset=utf-8',
+                    dataType:   'json',
+                    success:    function(data, status) {
+                        countryIcons = data.countryIcons;
+                        options.languageNameOfLangRefset = data.languageRefsetShortname;
+                        options.thirdPartyTrackingEnabled = data.thirdPartyTrackingEnabled;
+                        options.defaultAcceptLanguageMapping = data.defaultAcceptLanguage;
+                        options.multiDescriptionSearchAcceptLanguage = data.multiDescriptionSearchAcceptLanguage;
+                        dfd.resolve();
+                    }
+                });
+
+                return dfd.promise();
+            }
+            
+            $.when(getCodeSystems(), getConfig()).then(function() {
                 $('#edition-selector').css('display', 'block');
+
+                if (options.thirdPartyTrackingEnabled && options.publicBrowser) {
+                    initWidgetFeedback();
+                    initGoogleTag();
+                    initBrowserUpdate();
+                }
                 start();
             });
-        }   
+        }
+        
+        function initWidgetFeedback() {
+            var e = document.createElement('script');
+            e.type = 'text/javascript';
+            e.async = true;
+            e.src = 'https://s3.amazonaws.com/assets.freshdesk.com/widget/freshwidget.js';
+            e.onload = function () {
+                if (typeof FreshWidget !== "undefined" && typeof FreshWidget.init === "function") {
+                    document.getElementById("feedback-button").style.display = "block";
+
+                    FreshWidget.init("", {
+                        "queryString": "&widgetType=popup&formTitle=SNOMED+CT+Browser+Feedback&submitTitle=Send+Feedback&submitThanks=Thank+you+for+your+feedback&captcha=yes&searchArea=no",
+                        "utf8": "✓",
+                        "backgroundImage": "https://s3.amazonaws.com/assets.freshdesk.com/widget/help-button.png",
+                        "widgetType": "popup",
+                        "buttonType": "image",
+                        "buttonText": "Support",
+                        "buttonColor": "white",
+                        "buttonBg": "#00aadd",
+                        "alignment": "1",
+                        "offset": "-1500px",
+                        "submitThanks": "Thank you for your feedback",
+                        "formHeight": "500px",
+                        "captcha": "yes",
+                        "url": "https://ihtsdo.freshdesk.com",
+                        "loadOnEvent": "immediate"
+                    });
+                }
+            };
+
+            document.body.appendChild(e);
+        }
+
+        function initGoogleTag() {
+            var script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = 'https://www.googletagmanager.com/gtag/js?id=G-MFCMKEHSYB';
+            script.onload = function () {
+                window.dataLayer = window.dataLayer || [];
+                function gtag() { dataLayer.push(arguments); }
+                gtag('js', new Date());
+
+                gtag('config', 'G-MFCMKEHSYB');
+            };
+            document.body.appendChild(script);
+        }
+
+        function initBrowserUpdate() {
+            var e = document.createElement("script");
+            e.setAttribute("type", "text/javascript");
+            e.setAttribute("src", "//browser-update.org/update.js");
+            document.body.appendChild(e);
+        }
 
         function start() {
             $(function() {
@@ -227,6 +268,19 @@
                     });
                 });
                 $('.noSelect').disableTextSelect(); //No text selection on elements with a class of 'noSelect'
+            });
+
+            // hide any open popovers when the anywhere else in the body is clicked
+            $('body').on('mouseup', function (e) {
+                $("div[class$='-popover'],div[class*='-popover ']").each(function () {
+                    if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0  && $(this).hasClass("in")) {
+                        $.each($(this).attr('class').split(/\s+/), function(i, name) {
+                            if (name.indexOf('-popover') > -1) {
+                                $('#' + name.substr(0, name.indexOf('-popover'))).popover('hide');
+                            }
+                        });
+                    }
+                });
             });
 
             createCookieIfNotAcceptLicense();
@@ -411,18 +465,16 @@
             if(options.release.length > 0 && options.release !== 'None'){
                 branch = branch + "/" + options.release;
             };
-            if(!options.serverUrl.includes('snowowl')){
             $.ajaxSetup({
-                headers : {
-                    'Accept-Language': options.languages
+            headers : {
+                'Accept-Language': options.languages
                 }
-                });
-            };
+            });
             $.getJSON(options.serverUrl + "/browser/" + branch + "/members?active=true&limit=1", function(result) {                 
             }).done(function(result) {
                 var languageRefsets = [];            
                 Object.keys(result.referenceSets).forEach(function(key) {
-                    if (result.referenceSets[key].referenceSetType.id === '900000000000506000') {
+                    if (result.referenceSets[key].referenceSetType && result.referenceSets[key].referenceSetType.id === '900000000000506000') {
                         languageRefsets.push(result.referenceSets[key]);                                      
                     }
                 });
@@ -565,11 +617,11 @@
                         </ul>
                     </li>                    
 
-                    <li class="navbar-btn feedback-button">
+                    <li class="navbar-btn feedback-button" id="feedback-button" style="display: none">
                         <button type="button" class="btn btn-info" onclick="FreshWidget.show();
                                     return false;">
-                                <span class="i18n" data-i18n-id="i18n_feedback">Feedback</span>
-                            </button>
+                            <span class="i18n" data-i18n-id="i18n_feedback">Feedback</span>
+                        </button>
                     </li>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="i18n" data-i18n-id="i18n_about">Help</span> <b class="caret"></b></a>
@@ -661,7 +713,7 @@
                             <span class="i18n" data-i18n-id="i18n_licence_agreement_3">“SNOMED”, “SNOMED CT” and “SNOMED Clinical Terms” are registered trademarks of the SNOMED International (<a href="http://www.snomed.org">www.snomed.org</a>).</span></p>
                         <p><span class="i18n" data-i18n-id="i18n_licence_agreement_4">Use of SNOMED CT in <strong>SNOMED International SNOMED CT Browser</strong> is governed by the conditions of the following SNOMED CT license issued by the SNOMED International</span>:</p>
                         <p style="margin-left: 20px;">1. <span class="i18n" data-i18n-id="i18n_licence_agreement_5">The meaning of the terms “Affiliate”, or “Data Analysis System”, “Data Creation System”, “Derivative”, “End User”, “Extension”, “Member”, “Non-Member Territory”, “SNOMED CT” and “SNOMED CT Content” are as defined in the SNOMED International Affiliate License Agreement (see www.snomed.org/license.pdf)</span>.</p>
-                        <p style="margin-left: 20px;">2. <span class="i18n" data-i18n-id="i18n_licence_agreement_6">Information about Affiliate Licensing is available at <a href="http://snomed.org/license-affiliate">http://snomed.org/license-affiliate</a>. The Canadian Edition License Agreement is available from Canada Health Infoway.</a></span>.</p>
+                        <p style="margin-left: 20px;">2. <span class="i18n" data-i18n-id="i18n_licence_agreement_6">Information about Affiliate Licensing is available at <a href="http://snomed.org/license-affiliate">http://snomed.org/license-affiliate</a>. Individuals or organizations wishing to register as SNOMED International Affiliates can register at <a href="https://mlds.ihtsdotools.org">mlds.ihtsdotools.org</a>, subject to acceptance of the Affiliate License Agreement (see <a href="http://snomed.org/license-affiliate">http://snomed.org/license-affiliate)</a></span>.</p>
                         <p style="margin-left: 20px;">3. <span class="i18n" data-i18n-id="i18n_licence_agreement_7">The current list of SNOMED International Member Territories can be viewed at <a href="http://www.snomed.org/members">www.snomed.org/members</a>. Countries not included in that list are “Non-Member Territories”</span>.</p>
                         <p style="margin-left: 20px;">4. <span class="i18n" data-i18n-id="i18n_licence_agreement_8">End Users, that do not hold an SNOMED International Affiliate License, may access SNOMED CT® using <strong>SNOMED International SNOMED CT Browser</strong> subject to acceptance of and adherence to the following sub-license limitations</span>:</p>
                         <p style="margin-left: 40px;">a) <span class="i18n" data-i18n-id="i18n_licence_agreement_9">The sub-licensee is only permitted to access SNOMED CT® using this software (or service) for the purpose of exploring and evaluating the terminology</span>.</p>
@@ -705,67 +757,7 @@
         </div>
         <!-- /.modal-dialog -->
     </div>
-    <!-- /.modal -->
-
-    <!-- Using Freshdesk Widget for feedback -->
-    <script type="text/javascript" src="https://s3.amazonaws.com/assets.freshdesk.com/widget/freshwidget.js"></script>
-    <script type="text/javascript">
-        FreshWidget.init("", {
-            "queryString": "&widgetType=popup&formTitle=SNOMED+CT+Browser+Feedback&submitTitle=Send+Feedback&submitThanks=Thank+you+for+your+feedback&captcha=yes&searchArea=no",
-            "utf8": "✓",
-            "backgroundImage": "https://s3.amazonaws.com/assets.freshdesk.com/widget/help-button.png",
-            "widgetType": "popup",
-            "buttonType": "image",
-            "buttonText": "Support",
-            "buttonColor": "white",
-            "buttonBg": "#00aadd",
-            "alignment": "1",
-            "offset": "-1500px",
-            "submitThanks": "Thank you for your feedback",
-            "formHeight": "500px",
-            "captcha": "yes",
-            "url": "https://ihtsdo.freshdesk.com"
-        });
-    </script>
-    
-
-    <script type="text/javascript">
-        var $buoop = {};
-        $buoop.ol = window.onload;
-        window.onload = function() {
-            try {
-                if ($buoop.ol)
-                    $buoop.ol();
-            } catch (e) {}
-            var e = document.createElement("script");
-            e.setAttribute("type", "text/javascript");
-            e.setAttribute("src", "//browser-update.org/update.js");
-            document.body.appendChild(e);
-        }
-    </script>
-
-    <!--Start Cookie Script-->
-    <!--<script type="text/javascript" charset="UTF-8" src="http://chs02.cookie-script.com/s/b80c8456dc1c3b2bd6652feea1124eb1.js"></script>-->
-    <script src="/browser/external-libs/cookie-script.js" type="text/javascript" charset="UTF-8"></script>
-    <!--End Cookie Script-->
-
-    <!-- Google Analytics script -->
-    <script>
-        (function(i, s, o, g, r, a, m) {
-            i['GoogleAnalyticsObject'] = r;
-            i[r] = i[r] || function() {
-                (i[r].q = i[r].q || []).push(arguments)
-            }, i[r].l = 1 * new Date();
-            a = s.createElement(o),
-                m = s.getElementsByTagName(o)[0];
-            a.async = 1;
-            a.src = g;
-            m.parentNode.insertBefore(a, m)
-        })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
-        ga('create', 'UA-41892858-7', 'ihtsdotools.org');
-        ga('send', 'pageview');
-        ga('set', 'anonymizeIP', true);
-    </script>    
+    <!-- /.modal -->   
 </body>
 
 </html>

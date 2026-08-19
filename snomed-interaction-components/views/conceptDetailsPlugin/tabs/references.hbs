@@ -1,3 +1,6 @@
+<br/>
+<b><span style="padding-left: 10px;" class='i18n' data-i18n-id='i18n_concept_has_references'>{{i18n "i18n_concept_has_references" "This tab shows all concepts that are targeting the selected concept"}}.</span></b>
+<br/><br/>
 {{#each result.referencesByType}}
     <div style="margin-top: 10px;" class="panel panel-default">
         <div class="panel-heading">
@@ -22,21 +25,21 @@
                         <tr>
                             <td>
                                 {{#if_eq definitionStatus "PRIMITIVE"}}
-                                    <span class="badge alert-warning" draggable='true' ondragstart="drag(event, '{{../divElementId}}')" data-module="{{moduleId}}" data-concept-id='{{conceptId}}' data-term='{{fsn.term}}'>&nbsp;&nbsp;</span>
+                                    <span class="reference-item badge alert-warning context-menu" style="cursor: pointer" data-fsn="{{fsn.term}}" data-preferred-term="{{pt.term}}" draggable='true' ondragstart="drag(event, '{{../divElementId}}')" data-module="{{moduleId}}" data-concept-id='{{conceptId}}' data-term='{{fsn.term}}'>&nbsp;&nbsp;</span>
                                 {{else}}
-                                    <span class="badge alert-warning" draggable='true' ondragstart="drag(event, '{{../divElementId}}')" data-module="{{moduleId}}" data-concept-id='{{conceptId}}' data-term='{{fsn.term}}'>&equiv;</span>                                    
+                                    <span class="reference-item badge alert-warning context-menu" style="cursor: pointer" data-fsn="{{fsn.term}}" data-preferred-term="{{pt.term}}" draggable='true' ondragstart="drag(event, '{{../divElementId}}')" data-module="{{moduleId}}" data-concept-id='{{conceptId}}' data-term='{{fsn.term}}'>&equiv;</span>                                    
                                 {{/if_eq}}
                                 {{#hasCountryIcon moduleId}}
                                     <div class="phoca-flagbox" style="width:22px;height:22px">
                                         <span class="phoca-flag {{countryIcon moduleId}}"></span>
                                     </div>
                                 {{/hasCountryIcon}}
-                                {{fsn.term}}
+                                <span style="cursor: pointer" class="reference-item" data-concept-id='{{conceptId}}'>{{fsn.term}}</span>
                             </td>
                             <td>
-                                {{pt.term}}
+                                <span style="cursor: pointer" class="reference-item" data-concept-id='{{conceptId}}'>{{pt.term}}</span>
                             </td>
-                            <td>{{conceptId}}</td>
+                            <td><span style="cursor: pointer" class="reference-item" data-concept-id='{{conceptId}}'>{{conceptId}}</span></td>
                         </tr>
                     {{/each}}
                     </tbody>

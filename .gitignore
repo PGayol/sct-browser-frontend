@@ -51,5 +51,11 @@ bin
 .classpath
 .project
 
+# Cypress
+/cypress/videos/
+/cypress/reports/
+/cypress/screenshots/
+/cypress.env.json
+
 # Claude Code (config local por maquina)
 .claude/

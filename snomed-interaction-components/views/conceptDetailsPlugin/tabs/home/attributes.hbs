@@ -5,12 +5,13 @@
                 <i class="glyphicon glyphicon-export pull-right" style="color: white;" id="{{divElementId}}-copy-icon"></i>
             </button>
             <ul class="dropdown-menu small" role="menu" aria-labelledby="dropdownMenu1">
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" id="{{divElementId}}-copy-sctid" class="clip-btn" data-clipboard-text="{{firstMatch.conceptId}}">Copy ConceptId</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" id="{{divElementId}}-copy-term" class="clip-btn" data-clipboard-text="{{firstMatch.defaultTerm}}">Copy term</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" id="{{divElementId}}-copy-sctid-term" class="clip-btn" data-clipboard-text="{{firstMatch.conceptId}} |{{firstMatch.defaultTerm}}|">Copy ConceptId + term</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" id="{{divElementId}}-copy-sctid" class="clip-btn" data-clipboard-text="{{firstMatch.conceptId}}">Copy Concept ID</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" id="{{divElementId}}-copy-fsn" class="clip-btn" data-clipboard-text="{{firstMatch.fsn.term}}">Copy FSN</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" id="{{divElementId}}-copy-sctid-fsn" class="clip-btn" data-clipboard-text="{{firstMatch.conceptId}} |{{firstMatch.fsn.term}}|">Copy FSN and Concept ID</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" id="{{divElementId}}-copy-sctid-term" class="clip-btn" data-clipboard-text="{{firstMatch.conceptId}} |{{firstMatch.pt.term}}|">Copy PT and Concept ID</a></li>
                 {{#if panel.options.hideConceptShareLink}}
                 {{else}}
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" id="{{divElementId}}-copy-link" class="clip-btn" data-clipboard-text="{{link}}">Copy Link to share</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" id="{{divElementId}}-copy-link" class="clip-btn" data-clipboard-text="{{link}}">Copy link to share</a></li>
                 {{/if}}
             </ul>
         </div>
@@ -24,9 +25,9 @@
             {{firstMatch.fsn}}
         {{else}}
             {{firstMatch.defaultTerm}}
-        {{/if_undefined}}" 
+        {{/if_undefined}}"
        data-def-status="{{firstMatch.definitionStatus}}">
-        <span class="badge alert-warning">
+        <span class="badge alert-warning context-menu" data-concept-id="{{firstMatch.conceptId}}" data-fsn="{{firstMatch.fsn.term}}" data-preferred-term="{{firstMatch.pt.term}}">
         {{#if_eq firstMatch.definitionStatus "PRIMITIVE"}}
             &nbsp;&nbsp;
         {{else}}
@@ -35,19 +36,39 @@
         </span>
     </a>
     &nbsp;&nbsp;
-    {{#if_undefined firstMatch.fsn.term}}
-        {{firstMatch.fsn}}
+    {{#if panel.options.displayUsFsn}}
+        {{fsnTerm}}
     {{else}}
-        {{firstMatch.defaultTerm}}
-    {{/if_undefined}}
+        {{#if_undefined firstMatch.fsn.term}}
+            {{firstMatch.fsn}}
+        {{else}}
+            {{firstMatch.defaultTerm}}
+        {{/if_undefined}}
+    {{/if}}    
     <span class="pull-right">
-       <div class="phoca-flagbox" style="width:40px;height:40px">
+       <div class="phoca-flagbox" style="width:30px;height:30px">
            <span class="phoca-flag {{countryIcon firstMatch.moduleId}}"></span>
        </div>
     </span>
 </h4>
 
-<h5>SCTID: {{firstMatch.conceptId}}<br><br><div id="copy-content-custom">{{firstMatch.conceptId}} | 
+<h5>{{#if_gr firstMatch.alternateIdentifiers.length 0}}
+        <div style="vertical-align: top; padding-top: 5px; display: inline-block; margin-right: 10px;">SCTID: {{firstMatch.conceptId}}</div>
+        <div style="display: inline-block">
+        {{#if_is_long_conceptId firstMatch.conceptId}}
+            {{#each firstMatch.alternateIdentifiers}}{{#if active}}{{#if identifierScheme.pt.term}}<div class="row" style="background-color: #fff;color: rgb(66, 139, 202);padding-top: 2.5px; padding-bottom: 2px;
+                padding-left: 4px; padding-right: 4px;border: 1px solid darkgrey; border-radius: 4px; width: fit-content; margin-left: 0px; margin-right: -35px">{{identifierScheme.pt.term}}: {{alternateIdentifier}}</div>{{/if}}{{/if}}{{/each}}
+        {{else}}
+            {{#each firstMatch.alternateIdentifiers}}{{#if active}}{{#if identifierScheme.pt.term}}<div class="row" style="background-color: #fff;color: rgb(66, 139, 202);padding-top: 2.5px; padding-bottom: 2px;
+                padding-left: 4px; padding-right: 4px;border: 1px solid darkgrey; border-radius: 4px; width: fit-content; margin-left: 0px; margin-right: -75px">{{identifierScheme.pt.term}}: {{alternateIdentifier}}</div>{{/if}}{{/if}}{{/each}} 
+        {{/if_is_long_conceptId}}
+        </div>
+    {{/if_gr}}
+    {{#if_eq firstMatch.alternateIdentifiers.length 0}}
+        SCTID: {{firstMatch.conceptId}}
+    {{/if_eq}}
+
+    <br><br><div id="copy-content-custom">{{firstMatch.conceptId}} |
     {{#if_undefined firstMatch.fsn.term}}
         {{firstMatch.fsn}}
     {{else}}

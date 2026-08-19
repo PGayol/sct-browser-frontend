@@ -1,0 +1,15 @@
+{
+    "searchTerm": "heart",
+    "conceptId": "80891009",
+    "refinements": [
+        {
+            "searchTerm": "Laterality",
+            "conceptId": "272741003"
+        },
+        {
+            "searchTerm": "Side",
+            "conceptId": "182353008"
+        }
+    ]
+}
+

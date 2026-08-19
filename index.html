@@ -10,9 +10,40 @@
     <meta name="author" content="SNOMED International">
 
     <script src="internal-libs/snomed-interaction-components.min.js?version=build_version"></script>
-    <script type="text/javascript" src="ecl-builder/ecl-builder.js"></script>
+    <script type="text/javascript" src="internal-libs/node_modules/snomed-ecl-builder/output/ecl-builder.js"></script>
 
-    <link rel="stylesheet" type="text/css" href="ecl-builder/styles.css">
+    <style>
+        .ecl-builder ngb-typeahead-window.dropdown-menu {
+            max-width: 60vw !important;
+        }
+
+        .ecl-builder div.modal-body button.circle {
+            top: 20px !important;
+        }
+
+        .ecl-builder div.expression-group.grey div.expression-row:first-child div.position-relative,
+        .ecl-builder div.expression-group.grey div.expression-row:first-child input[type=text] {
+            width: 61.3vw !important;
+        }
+
+        .ecl-builder div.expression-group.grey div.expression-row:not(:first-child) div.position-relative,
+        .ecl-builder div.expression-group.grey div.expression-row:not(:first-child) input[type=text] {
+            width: 57vw !important;
+        }
+
+        .ecl-builder div.expression-group.blue div.expression-row:not(:first-child) div.position-relative,
+        .ecl-builder div.expression-group.blue div.expression-row:not(:first-child) input[type=text] {
+            width: 19.85vw !important;
+        }
+
+        .ecl-builder div.expression-group.grey div.expression-row:first-child ngb-typeahead-window.dropdown-menu {
+            left: 0px !important;
+        }
+
+        .ecl-builder div.expression-group.grey div.expression-row:not(:first-child) ngb-typeahead-window.dropdown-menu {
+            left: 0px !important;
+        }
+    </style>
     <link rel="stylesheet" type="text/css" href="css/external.css">
 
     <style>

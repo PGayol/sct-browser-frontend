@@ -1,0 +1,148 @@
+{
+    "imsUrl": "https://dev-ims.ihtsdotools.org/",
+    "languageRefsetShortname" : {
+        "20581000087109": "fr-CA",
+        "19491000087109": "en-CA",
+        "900000000000508004": "GB",
+        "900000000000509007": "US",
+        "450828004": "ES",
+        "5641000179103": "ES-UY",
+        "554461000005103": "DA",
+        "46011000052107": "SV",
+        "32570271000036106": "AU",
+        "11000146104": "NL",
+        "31000146106": "NL",
+        "31000172101": "NL",
+        "15551000146102": "NL-PF",
+        "61000202103": "NO-NB",
+        "91000202106": "NO-NN",
+        "21000172104": "FR",
+        "21000220103": "IE",
+        "71000181105": "ET",
+        "281000210109": "NZ-PF",
+        "271000210107": "NZ",
+        "722128001": "ZH",
+        "291000210106": "MI",
+        "21000241105": "FR",
+        "722130004": "DE",
+        "2041000195100": "DE",
+        "2021000195106": "FR",
+        "2031000195108": "IT",
+        "31000274107": "DE",
+        "10031000315102": "FR",
+        "21000234103": "DE"
+    },
+    "countryIcons" : {
+        "999000041000000102": "gb",
+        "999000011000000103": "gb",
+        "999000021000000109": "gb",
+        "999000031000000106": "gb",
+        "999000021000001108": "gb",
+        "999000871000001102": "gb",
+        "999000011000001104": "gb",
+        "748131000000104": "gb",
+        "1326041000000107": "gb",
+        "1326031000000103": "gb",
+        "450829007": "es",
+        "11000221109": "ar",
+        "11000220105": "ie",
+        "1601000220105": "ie",
+        "900000001000122104": "es-ES",
+        "731000124108": "us",
+        "5991000124107": "us",
+        "161771000036108": "au",
+        "32570231000036109": "au",
+        "32506021000036107": "au",
+        "32570491000036106": "au",
+        "900062011000036108": "au",
+        "45991000052106": "se",
+        "554471000005108": "dk",
+        "9999999998": "gmdn",
+        "466707005": "mdp",
+        "11000146104": "nl",
+        "20621000087109": "ca",
+        "19481000087107": "ca",
+        "20611000087101": "ca",
+        "22091000087100": "ca",
+        "5641000179103": "uy",
+        "5631000179106": "uy",
+        "11000172109": "be",
+        "21000210109": "nz",
+        "51000202101": "no",
+        "57091000202101": "no",
+        "11000181102": "ee",
+        "11000241103": "common-fr",
+        "2011000195101": "ch",
+        "11000234105": "at",
+        "11000267109": "kr",
+        "11000229106": "fi",
+        "61001000107": "da-ch",
+        "11000274103": "de",
+        "11000315107": "fr",
+        "11000318109": "jm",
+        "11000314106": "pt",
+        "11000279109": "cz",
+        "11000316108": "il",
+        "11000287105": "th",
+        "21000325107": "cl",
+        "11000328104": "mt"
+
+    },
+    "countryLinksOrder": ["ar", "au", "be", "ca", "dk", "nl", "se", "gb", "us", "uy", "nz"],
+    "countryLinks": {
+        "ar": {
+            "url": "https://www.argentina.gob.ar/salud/snomed",
+            "label": "SNOMED Argentina"
+        },
+        "au": {
+            "url": "https://www.digitalhealth.gov.au/",
+            "label": "Australian Digital Health Agency"
+        },
+        "be": {
+            "url": "https://apps.health.belgium.be/terminology-portal/standards/terminology_standards/snomed_ct/nl",
+            "label": "Federal Public Service Health, Food Chain Safety and Environment, Belgium"
+        },
+        "ca": {
+            "url": "https://ic.infoway-inforoute.ca/",
+            "label": "Canada Health Infoway, Canada"
+        },
+        "dk": {
+            "url": "https://sundhedsdatastyrelsen.dk/",
+            "label": "The Danish Health Data Authority, Denmark"
+        },
+        "nl": {
+            "url": "https://www.nictiz.nl/",
+            "label": "Nictiz, Netherlands"
+        },
+        "se": {
+            "url": "https://www.socialstyrelsen.se",
+            "label": "The National Board of Health and Welfare, Sweden"
+        },
+        "gb": {
+            "url": "https://digital.nhs.uk/article/290/Terminology-and-Classifications",
+            "label": "UK Terminology Centre, NHS Digital, United Kingdom"
+        },
+        "us": {
+            "url": "http://www.nlm.nih.gov/",
+            "label": "National Library of Medicine (NLM), United States"
+        },
+        "uy": {
+            "url": "https://www.gub.uy/agencia-gobierno-electronico-sociedad-informacion-conocimiento/node/346",
+            "label": "Salud Digital- AGESIC, Uruguay"
+        },
+        "nz": {
+            "url": "https://www.health.govt.nz/nz-health-statistics/classification-and-terminology/new-zealand-snomed-ct-national-release-centre",
+            "label": "New Zealand SNOMED CT National Release Centre"
+        }
+    },
+    "singleCharacterSearchLanguageRefsets": ["21000267104", "722128001"],
+    "showIssueCollector": false,
+    "thirdPartyTrackingEnabled": false,
+    "multiDescriptionSearchAcceptLanguage": "en,es",
+    "defaultAcceptLanguage" : {
+        "SNOMEDCT-NZ": "en-X-271000210107",
+        "SNOMEDCT-SE": "sv-X-46011000052107",
+        "SNOMEDCT-IE": "en-X-21000220103",
+        "SNOMEDCT-NO": "no-X-61000202103"
+    }
+}
