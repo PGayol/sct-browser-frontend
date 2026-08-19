@@ -50,3 +50,6 @@ bin
 .settings/org.eclipse.jdt.apt.core.prefs
 .classpath
 .project
+
+# Claude Code (config local por maquina)
+.claude/
