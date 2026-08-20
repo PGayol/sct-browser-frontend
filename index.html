@@ -515,6 +515,14 @@
 
         function addEditionLinks($releaseSwitcher, releases, addLinkToSnomedBrowser) {
             console.log("Adding edition links for releases: ", releases);
+            // Los botones se alinean por fila y toman todos la altura del mas alto.
+            // El gap reemplaza los margin-left/margin-bottom que traia cada boton.
+            $releaseSwitcher.css({
+                "display": "flex",
+                "flex-wrap": "wrap",
+                "align-items": "stretch",
+                "gap": "10px"
+            });
             for (let i = 0; i < releases.length; ++i) {
                 let release = releases[i];
                 if (typeof release.latestVersion !== 'undefined' || options.dailyBuildBrowser || options.communityBrowser || options.publicBrowser) {
@@ -544,7 +552,7 @@
                         $span2.append(release.name);
                     }
 
-                    var $a = $('<a>').attr("class", "btn btn-primary btn-lg").attr("role", "button").attr("style", "margin-bottom : 15px");
+                    var $a = $('<a>').attr("class", "btn btn-primary btn-lg").attr("role", "button").attr("style", "text-align: left;");
                     if (!options.communityBrowser) {
                         $a.append($img);
                     }
@@ -616,14 +624,16 @@
             }
             if (addLinkToSnomedBrowser && addLinkToSnomedBrowser != "") {
                 var snomedInternationalBrowserButton = '<a class="btn btn-primary btn-lg" role="button" style="margin-bottom : 15px" target="_blank" href="' + addLinkToSnomedBrowser + '"><img src="img/logo.png" style="height:20px">&nbsp;&nbsp;&nbsp;<span class="i18n" data-i18n-id="i18n_go_browsing">Go browsing...</span><br><span class="small">SNOMED International <br> <div class="i18n" data-i18n-id="i18n_browser">Browser</div></span></a>';
-                var multiBrowserButton = '<a class="btn btn-primary btn-lg" role="button" style="margin-bottom : 15px; margin-left: 5px;" target="_blank" href="' + 'https://browser.ihtsdotools.org/multi-extension-search.html' + '"><img src="img/logo.png" style="height:20px">&nbsp;&nbsp;&nbsp;<span class="i18n" data-i18n-id="i18n_go_browsing">Go browsing...</span><br><span class="small">SNOMED International <br> <div class="i18n" data-i18n-id="i18n_multi_extension_browser"> Multi Extension Browser </div></span></a>';
+                var multiBrowserButton = '<a class="btn btn-primary btn-lg" role="button" style="text-align: left;" target="_blank" href="' + 'https://browser.ihtsdotools.org/multi-extension-search.html' + '"><img src="img/logo.png" style="height:20px">&nbsp;&nbsp;&nbsp;<span class="i18n" data-i18n-id="i18n_go_browsing">Go browsing...</span><br><span class="small">SNOMED International <br> <div class="i18n" data-i18n-id="i18n_multi_extension_browser"> Multi Extension Browser </div></span></a>';
                 var internationalDailyBuildButton = '<a class="btn btn-primary btn-lg" role="button" style="margin-bottom : 15px; margin-left: 5px;" target="_blank" href="' + 'https://dailybuild.ihtsdotools.org/' + '"><img src="img/logo.png" style="height:20px">&nbsp;&nbsp;&nbsp;<span class="i18n" data-i18n-id="i18n_go_browsing">Go browsing...</span><br><span class="small">SNOMED International <br> <div class="i18n" data-i18n-id="i18n_daily_build_browser">Daily Build Browser </div></span></a>';
-                var mrcmBrowser = '<a class="btn btn-primary btn-lg" role="button" style="height:81px; width:165px; margin-bottom:10px;" href="/mrcm" target="_blank"><span style="margin-left:15px;">MRCM Browser</span><span class="glyphicon glyphicon-tasks" style="top: 30px; left: -70px; font-size: 18px;"></span></a>';
+                // Sin height fija: el contenedor es flex y estira los botones a la misma altura.
+                var mrcmBrowser = '<a class="btn btn-primary btn-lg" role="button" style="width:165px; display:flex; flex-direction:column; align-items:center; justify-content:center;" href="/mrcm" target="_blank"><span>MRCM Browser</span><span class="glyphicon glyphicon-tasks" style="font-size: 18px; margin-top: 6px;"></span></a>';
                 // Espana: solo se muestran MRCM y Multi Extension.
                 // Quedan fuera el Daily Build Browser y el Browser de SNOMED International.
                 // El h3 "Published editions" encabezaba esos dos, asi que tambien sale.
                 // $releaseSwitcher.append(internationalDailyBuildButton + '<br>');
-                $releaseSwitcher.append(mrcmBrowser + '<br>');
+                // Sin <br>: el salto de linea lo maneja el flex-wrap del contenedor.
+                $releaseSwitcher.append(mrcmBrowser);
                 // $releaseSwitcher.append('<h3 class="i18n" data-i18n-id="i18n_published_editions">Published editions</h3>');
                 // $releaseSwitcher.append(snomedInternationalBrowserButton);
                 $releaseSwitcher.append(multiBrowserButton);
