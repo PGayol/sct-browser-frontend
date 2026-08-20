@@ -141,7 +141,7 @@
             diagrammingMarkupEnabled: false,
             statusSearchFilter: "activeOnly",
             highlightByEffectiveTime: "false",
-            dailyBuildBrowser: false,
+            dailyBuildBrowser: true,
             publicBrowser: false,
             previewBrowser: false,
             tsBrowser: false,
@@ -231,7 +231,7 @@
             // } else if (window.location.hostname.includes('concrete') || window.location.hostname.includes('preview')) {
                 // options.previewBrowser = true;
             // } else if (window.location.hostname.includes('browser')) {
-                options.publicBrowser = true;
+                // options.publicBrowser = true;   // Espana: modo daily build
             // } else {
             //     // do nothing
             // }
@@ -318,7 +318,10 @@
                                 internationalReleases.push(release);
                                 if (release.maintainerType && release.maintainerType === 'Community Content') {
                                     options.communityContentReleases.push(release);
-                                } else {
+                                } else if (release.dailyBuildAvailable) {
+                                    // Solo las ediciones con daily build llegan al home.
+                                    // Sin este filtro entrarian tambien SNOMEDCT y SNOMEDCT-ES,
+                                    // que tienen dailyBuildAvailable: false.
                                     options.dailyBuildReleases.push(release);
                                     dailyBuildInternational.push(release);
                                 }
@@ -529,7 +532,7 @@
                                 date = new Date(result.head);
                             }
                             var ui_lang = localStorage.getItem("ui_language");
-                            var date_lang = ui_lang == "fr" ? 'fr-CA' : 'en-US'
+                            var date_lang = ui_lang == "en" ? 'en-US' : (ui_lang == "fr" ? 'fr-CA' : 'es-ES')
                             options.lastUpdateTimeFromSnowstorm = date;
                             $("#lastUpdateTimeFromSnowstorm").text(date.toLocaleString(date_lang, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }));
                         });
@@ -616,10 +619,13 @@
                 var multiBrowserButton = '<a class="btn btn-primary btn-lg" role="button" style="margin-bottom : 15px; margin-left: 5px;" target="_blank" href="' + 'https://browser.ihtsdotools.org/multi-extension-search.html' + '"><img src="img/logo.png" style="height:20px">&nbsp;&nbsp;&nbsp;<span class="i18n" data-i18n-id="i18n_go_browsing">Go browsing...</span><br><span class="small">SNOMED International <br> <div class="i18n" data-i18n-id="i18n_multi_extension_browser"> Multi Extension Browser </div></span></a>';
                 var internationalDailyBuildButton = '<a class="btn btn-primary btn-lg" role="button" style="margin-bottom : 15px; margin-left: 5px;" target="_blank" href="' + 'https://dailybuild.ihtsdotools.org/' + '"><img src="img/logo.png" style="height:20px">&nbsp;&nbsp;&nbsp;<span class="i18n" data-i18n-id="i18n_go_browsing">Go browsing...</span><br><span class="small">SNOMED International <br> <div class="i18n" data-i18n-id="i18n_daily_build_browser">Daily Build Browser </div></span></a>';
                 var mrcmBrowser = '<a class="btn btn-primary btn-lg" role="button" style="height:81px; width:165px; margin-bottom:10px;" href="/mrcm" target="_blank"><span style="margin-left:15px;">MRCM Browser</span><span class="glyphicon glyphicon-tasks" style="top: 30px; left: -70px; font-size: 18px;"></span></a>';
-                $releaseSwitcher.append(internationalDailyBuildButton + '<br>');
+                // Espana: solo se muestran MRCM y Multi Extension.
+                // Quedan fuera el Daily Build Browser y el Browser de SNOMED International.
+                // El h3 "Published editions" encabezaba esos dos, asi que tambien sale.
+                // $releaseSwitcher.append(internationalDailyBuildButton + '<br>');
                 $releaseSwitcher.append(mrcmBrowser + '<br>');
-                $releaseSwitcher.append('<h3 class="i18n" data-i18n-id="i18n_published_editions">Published editions</h3>');
-                $releaseSwitcher.append(snomedInternationalBrowserButton);
+                // $releaseSwitcher.append('<h3 class="i18n" data-i18n-id="i18n_published_editions">Published editions</h3>');
+                // $releaseSwitcher.append(snomedInternationalBrowserButton);
                 $releaseSwitcher.append(multiBrowserButton);
 
             }
@@ -2081,7 +2087,7 @@
                 }
                 if (options.lastUpdateTimeFromSnowstorm && options.lastUpdateTimeFromSnowstorm !== '') {
                     var ui_lang = localStorage.getItem("ui_language");
-                    var date_lang = ui_lang == "fr" ? 'fr-CA' : 'en-US'
+                    var date_lang = ui_lang == "en" ? 'en-US' : (ui_lang == "fr" ? 'fr-CA' : 'es-ES')
                     // $("#lastUpdateTimeFromSnowstorm").text(options.lastUpdateTimeFromSnowstorm.toLocaleDateString(date_lang, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }));
                     $("#lastUpdateTimeFromSnowstorm").text(options.lastUpdateTimeFromSnowstorm.toLocaleString(date_lang, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }));
                 }
